@@ -1,7 +1,7 @@
 // Home page styles
-@import 'master-page';
 @import '../utilities/variables';
 
+// ============ BASE ============
 * {
   box-sizing: border-box;
 }
@@ -13,39 +13,100 @@ body {
   font-size: $font-size-base;
   margin: 0;
   padding: 0;
+
+  @media (max-width: $breakpoint-md) {
+    font-family: $font-family-fallback; // Arial on mobile
+  }
 }
 
 .sp-container {
   max-width: 100%;
 }
 
-/* ============ TOOLBAR (Desktop) ============ */
-.sp-toolbar {
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-  gap: 0;
+// ============ NAVBAR (Override Bootstrap) ============
+.sp-navbar {
   background-color: $sp-bg;
+  padding: $spacing-sm 0;
+
+  .container-fluid {
+    padding: 0;
+  }
 }
 
-.sp-btn {
+// Toggler button (mobile hamburger)
+.sp-toggler {
+  border: 1px solid $sp-border;
+  border-radius: 2px;
+  padding: $spacing-xs;
+  margin-right: $spacing-lg;
+  background: $sp-bg;
+
+  &:hover {
+    background: $sp-bg-hover;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+// Menu items
+.sp-navbar .navbar-nav {
+  gap: 0;
+
+  @media (max-width: $breakpoint-md) {
+    border-top: 2px solid $sp-border;
+    padding: 0;
+  }
+}
+
+.sp-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
   background: transparent;
   border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding: $spacing-sm $spacing-md;
   font-size: $font-size-base;
   font-weight: 400;
   color: $sp-text;
-  gap: $spacing-xs;
   white-space: nowrap;
 
   &:hover {
     background: $sp-bg-light;
   }
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+    padding: $spacing-sm $spacing-nav;
+    font-size: $font-size-lg;
+    justify-content: flex-start;
+
+    &:hover {
+      background: $sp-bg-hover-dark;
+      color: $sp-text-dark;
+      font-weight: 500;
+    }
+  }
 }
 
+.sp-nav-more {
+  @media (max-width: $breakpoint-md) {
+    iconify-icon {
+      display: none;
+    }
+
+    &::after {
+      content: '...';
+      font-size: $icon-size-lg;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+  }
+}
+
+// Icon colors
 .sp-icon-pink {
   color: $sp-pink;
   font-size: $icon-size-base;
@@ -62,86 +123,7 @@ body {
   margin: 2px 0 0 2px;
 }
 
-.sp-dots {
-  font-size: $icon-size-lg;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: $sp-text;
-}
-
-/* ============ MOBILE HEADER ============ */
-.sp-mobile-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: $spacing-lg;
-  background-color: $sp-bg;
-  font-family: $font-family-fallback;
-}
-
-#mobileMenu {
-  border-top: 2px solid $sp-border;
-}
-
-.sp-hamburger-btn {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 40px;
-  height: 32px;
-  background: $sp-bg;
-  border: 1px solid #bbb;
-  border-radius: 2px;
-  cursor: pointer;
-  padding: $spacing-xs;
-
-  &:hover {
-    background: #e0e0e0;
-  }
-}
-
-/* ============ MOBILE MENU ============ */
-.sp-mobile-menu {
-  background: $sp-bg;
-  font-family: $font-family-fallback;
-}
-
-.sp-mobile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-sm 20px;
-  color: $sp-text;
-  text-decoration: none;
-  font-size: $font-size-lg;
-  font-weight: 400;
-
-  &:hover {
-    background: #b8b8b8;
-    color: #000000;
-    font-weight: 500;
-  }
-
-  iconify-icon:first-child {
-    font-size: $icon-size-base;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  span {
-    white-space: nowrap;
-  }
-
-  .sp-chevron {
-    font-size: $icon-size-sm;
-    color: $sp-text-light;
-    margin-left: 2px;
-  }
-}
-
-/* ============ TITLE ============ */
+// ============ TITLE ============
 .sp-title {
   font-size: $font-size-title;
   font-weight: 100;
@@ -151,49 +133,40 @@ body {
 
   @media (max-width: $breakpoint-md) {
     font-size: $font-size-title-mobile;
-    margin: $spacing-lg 0 0 $spacing-lg;
+    margin: $spacing-lg;
   }
 }
 
-/* ============ TABLE (Desktop) ============ */
+// ============ DOCUMENT TABLE ============
 .sp-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0;
+  margin: 0 $spacing-xl;
 
+  @media (max-width: $breakpoint-md) {
+    margin: $spacing-lg;
+    width: calc(100% - #{$spacing-lg * 2});
+  }
+
+  // ============ DESKTOP: Normal table ============
   thead {
+    @media (max-width: $breakpoint-md) {
+      display: none; // Hide header on mobile
+    }
+
     tr {
       border-bottom: 2px solid $sp-head-border;
     }
 
     th {
+      padding: $spacing-sm $spacing-xl $spacing-sm 0;
       font-weight: 400;
-      font-size: 14px;
-      color: $sp-text-light;
-      padding: 8px 12px 8px 0;
-      text-align: left;
+      font-size: $font-size-base;
+      color: $sp-text;
       vertical-align: middle;
-      border: none;
-      background: transparent;
 
-      &.col-icon {
-        width: 58px;
-        padding-left: 32px;
-      }
-
-      .th-icon {
-        font-size: 18px;
-        color: $sp-text-light;
-      }
-
-      .th-text {
-        color: $sp-text;
-      }
-
-      .th-chevron {
-        font-size: 14px;
-        color: $sp-text-light;
-        margin: 2px 0 0 2px;
+      .sp-chevron {
+        margin-left: 4px;
       }
     }
   }
@@ -201,52 +174,148 @@ body {
   tbody {
     tr {
       border-bottom: 1px solid $sp-border;
-      background-color: transparent;
 
       &:hover {
-        background-color: $sp-bg !important;
+        background-color: $sp-bg;
+      }
 
-        td {
-          background-color: $sp-bg;
+      // ============ MOBILE: Row becomes card ============
+      @media (max-width: $breakpoint-md) {
+        display: block;
+        border: 1px solid $sp-head-border;
+        margin-bottom: $spacing-xl;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:hover {
+          background-color: transparent;
         }
       }
     }
 
     td {
-      padding: 14px 12px 14px 0;
-      font-size: 14px;
+      padding: $spacing-table $spacing-xl $spacing-table 0;
+      font-size: $font-size-base;
       color: $sp-text;
-      border: none;
       vertical-align: middle;
-
-      &.col-icon {
-        width: 58px;
-        padding-left: 32px;
-        text-align: center;
-      }
 
       &:nth-child(3),
       &:nth-child(4) {
         color: $sp-text-light;
       }
-    }
 
-    .name-cell {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
+      // ============ MOBILE: Cell becomes row ============
+      @media (max-width: $breakpoint-md) {
+        display: flex;
+        align-items: center;
+        padding: 10px $spacing-md;
+        border-bottom: 1px solid $sp-border;
+        background-color: $sp-bg-light;
 
-      .sp-icon-pink {
-        position: absolute;
-        top: 10px;
-        left: -8px;
-        font-size: 10px;
+        &:last-child {
+          border-bottom: none;
+        }
+
+        // Show label from data-label attribute
+        &::before {
+          content: attr(data-label);
+          font-size: $font-size-sm;
+          color: $sp-text-light;
+          font-weight: bold;
+          font-style: italic;
+          width: 30%;
+          flex-shrink: 0;
+        }
       }
     }
   }
 }
 
+// Column widths
+.sp-col-icon {
+  width: 58px;
+  padding-left: 32px;
+  text-align: right;
+
+  iconify-icon {
+    font-size: $icon-size-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    background-color: $sp-bg;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+.sp-col-name {
+  width: 35%;
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+  }
+}
+
+.sp-col-modified,
+.sp-col-modified-by {
+  width: 20%;
+  color: $sp-text-light;
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+    color: $sp-text;
+    font-size: $font-size-sm;
+  }
+}
+
+.sp-col-add {
+  width: 15%;
+
+  @media (max-width: $breakpoint-md) {
+    display: none;
+    padding: 0 !important;
+  }
+}
+
+// Glimmer icon (star indicator)
+.sp-glimmer {
+  color: $sp-pink;
+  font-size: $icon-size-sm;
+}
+
+// Name content wrapper (glimmer + value)
+.sp-name-content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .sp-glimmer {
+    position: absolute;
+    top: -4px;
+    left: -8px;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    width: 70%;
+    display: flex;
+    align-items: flex-start;
+
+    .sp-glimmer {
+      position: static;
+      flex-shrink: 0;
+      margin-top: -2px;
+    }
+
+    .sp-value {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+// File type icons
 .folder-icon {
   font-size: $icon-size-lg;
   color: $sp-folder;
@@ -260,61 +329,4 @@ body {
 .word-icon {
   font-size: $icon-size-lg;
   color: $sp-word;
-}
-
-/* ============ MOBILE CARD LIST ============ */
-.sp-mobile-list {
-  padding: $spacing-lg;
-  font-family: $font-family-fallback;
-}
-
-.sp-mobile-card {
-  padding: 0;
-  border: 1px solid $sp-head-border;
-  margin-bottom: $spacing-xl;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.sp-card-row {
-  display: flex;
-  align-items: center;
-  background-color: $sp-bg-light;
-  padding: 10px $spacing-md;
-  border-bottom: 1px solid $sp-border;
-
-  &:first-child {
-    background-color: $sp-bg;
-    justify-content: space-between;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.sp-card-label {
-  font-size: $font-size-sm;
-  color: $sp-text-light;
-  font-weight: bold;
-  font-style: italic;
-  width: 25%;
-}
-
-.sp-card-value {
-  font-size: $font-size-sm;
-  color: $sp-text;
-  display: flex;
-  text-align: right;
-  word-break: break-word;
-  max-width: 65%;
-
-  .sp-icon-pink {
-    font-size: $icon-size-sm;
-    position: relative;
-    top: -4px;
-    left: 0;
-  }
 }

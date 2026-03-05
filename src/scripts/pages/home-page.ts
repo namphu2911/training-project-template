@@ -1,10 +1,5 @@
-import ready from '../utilities/_helper';
-import renderGrid from '../components/_grid';
-import renderHome from '../components/_home';
+// Home page - No dynamic rendering needed
+// Bootstrap handles navbar toggle via data attributes
+// Document list is rendered in HTML with CSS responsive
 
-ready(() => {
-  renderGrid();
-
-  // Render home page content
-  renderHome();
-});
+console.log('Home page loaded');

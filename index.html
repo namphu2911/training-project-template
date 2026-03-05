@@ -8,9 +8,6 @@
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="./dist/css/home-page.css" rel="stylesheet">
 
   <!-- Iconify -->
@@ -21,112 +18,171 @@
 
   <div class="sp-container">
 
-    <!-- Desktop Toolbar -->
-    <div class="sp-toolbar d-none d-md-flex align-items-center">
-      <button class="sp-btn">
-        <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon> New <iconify-icon
-          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-      </button>
-      <button class="sp-btn">
-        <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon> Upload <iconify-icon
-          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-      </button>
-      <button class="sp-btn">
-        <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon> Sync
-      </button>
-      <button class="sp-btn">
-        <iconify-icon icon="vscode-icons:file-type-excel2" class="sp-icon-green"></iconify-icon> Export to Excel
-      </button>
-      <button class="sp-btn">
-        <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon> Flow <iconify-icon
-          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-      </button>
-      <button class="sp-btn">
-        <iconify-icon icon="fluent-mdl2:more"></iconify-icon>
-      </button>
-    </div>
+    <!-- ============ NAVBAR (Bootstrap Responsive) ============ -->
+    <nav class="navbar navbar-expand-md sp-navbar">
+      <div class="container-fluid px-0">
+        <!-- Toggler (hiện trên mobile) -->
+        <button class="navbar-toggler ms-auto sp-toggler" type="button" 
+                data-bs-toggle="collapse" data-bs-target="#spNavbar" 
+                aria-controls="spNavbar" aria-expanded="false" aria-label="Toggle navigation">
+          <iconify-icon icon="pajamas:hamburger"></iconify-icon>
+        </button>
 
-    <!-- Mobile Header with Hamburger -->
-    <div class="sp-mobile-header d-md-none">
-      <button class="sp-hamburger-btn" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
-        aria-expanded="false">
-        <iconify-icon icon="pajamas:hamburger"></iconify-icon>
-      </button>
-    </div>
-
-    <!-- Mobile Dropdown Menu -->
-    <div class="collapse d-md-none" id="mobileMenu">
-      <div class="sp-mobile-menu">
-        <a href="#" class="sp-mobile-menu-item">
-          <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon>
-          <span>New <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
-        </a>
-        <a href="#" class="sp-mobile-menu-item">
-          <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon>
-          <span>Upload <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
-        </a>
-        <a href="#" class="sp-mobile-menu-item">
-          <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon>
-          <span>Sync</span>
-        </a>
-        <a href="#" class="sp-mobile-menu-item">
-          <iconify-icon icon="vscode-icons:file-type-excel2"></iconify-icon>
-          <span>Export to Excel</span>
-        </a>
-        <a href="#" class="sp-mobile-menu-item">
-          <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon>
-          <span>Flow</span>
-        </a>
-        <a href="#" class="sp-mobile-menu-item">
-          <span class="sp-dots">...</span>
-        </a>
+        <!-- Menu items -->
+        <div class="collapse navbar-collapse" id="spNavbar">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn">
+                <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon>
+                <span>New</span>
+                <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn">
+                <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon>
+                <span>Upload</span>
+                <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn">
+                <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon>
+                <span>Sync</span>
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn">
+                <iconify-icon icon="vscode-icons:file-type-excel2" class="sp-icon-green"></iconify-icon>
+                <span>Export to Excel</span>
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn">
+                <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon>
+                <span>Flow</span>
+                <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link sp-nav-btn sp-nav-more">
+                <iconify-icon icon="fluent-mdl2:more"></iconify-icon>
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </nav>
 
-    <!-- Title -->
+    <!-- ============ TITLE ============ -->
     <h1 class="sp-title">Documents</h1>
 
-    <!-- Desktop Table -->
-    <div class="table-responsive d-none d-md-block ms-4">
-      <table class="table sp-table">
-        <thead>
-          <tr>
-            <th class="col-icon">
-              <iconify-icon icon="fluent-mdl2:page" class="th-icon"></iconify-icon>
-            </th>
-            <th>
-              <span class="th-text">Name</span>
-              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-            </th>
-            <th>
-              <span class="th-text">Modified</span>
-              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-            </th>
-            <th>
-              <span class="th-text">Modified By</span>
-              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-            </th>
-            <th>
-              <iconify-icon icon="fluent-mdl2:add"></iconify-icon>
-              <span class="th-text">Add column</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Rendered dynamically by JavaScript -->
-        </tbody>
-      </table>
-    </div>
+    <!-- ============ DOCUMENT TABLE (Responsive) ============ -->
+    <table class="sp-table">
+      <thead>
+        <tr>
+          <th class="sp-col-icon">
+            <iconify-icon icon="fluent-mdl2:page"></iconify-icon>
+          </th>
+          <th class="sp-col-name">
+            Name <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+          </th>
+          <th class="sp-col-modified">
+            Modified <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+          </th>
+          <th class="sp-col-modified-by">
+            Modified By <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+          </th>
+          <th class="sp-col-add">
+            <iconify-icon icon="fluent-mdl2:add"></iconify-icon> Add column
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1: Folder -->
+        <tr>
+          <td class="sp-col-icon" data-label="File Type">
+            <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
+          </td>
+          <td class="sp-col-name" data-label="Name">
+            <span class="sp-name-content">
+              <span class="sp-value">CAS</span>
+            </span>
+          </td>
+          <td class="sp-col-modified" data-label="Modified">April 30</td>
+          <td class="sp-col-modified-by" data-label="Modified By">Megan Bowen</td>
+          <td class="sp-col-add"></td>
+        </tr>
 
-    <!-- Mobile Card List -->
-    <div class="d-md-none sp-mobile-list">
-      <!-- Rendered dynamically by JavaScript -->
-    </div>
+        <!-- Row 2: Excel with glimmer -->
+        <tr>
+          <td class="sp-col-icon" data-label="File Type">
+            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+          </td>
+          <td class="sp-col-name" data-label="Name">
+            <span class="sp-name-content">
+              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+              <span class="sp-value">CoasterAndBargeLoading.xlsx</span>
+            </span>
+          </td>
+          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+          <td class="sp-col-add"></td>
+        </tr>
+
+        <!-- Row 3: Excel with glimmer -->
+        <tr>
+          <td class="sp-col-icon" data-label="File Type">
+            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+          </td>
+          <td class="sp-col-name" data-label="Name">
+            <span class="sp-name-content">
+              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+              <span class="sp-value">RevenueByServices.xlsx</span>
+            </span>
+          </td>
+          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+          <td class="sp-col-add"></td>
+        </tr>
+
+        <!-- Row 4: Excel with glimmer -->
+        <tr>
+          <td class="sp-col-icon" data-label="File Type">
+            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+          </td>
+          <td class="sp-col-name" data-label="Name">
+            <span class="sp-name-content">
+              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+              <span class="sp-value">RevenueByServices2016.xlsx</span>
+            </span>
+          </td>
+          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+          <td class="sp-col-add"></td>
+        </tr>
+
+        <!-- Row 5: Excel with glimmer -->
+        <tr>
+          <td class="sp-col-icon" data-label="File Type">
+            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+          </td>
+          <td class="sp-col-name" data-label="Name">
+            <span class="sp-name-content">
+              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+              <span class="sp-value">RevenueByServices2017.xlsx</span>
+            </span>
+          </td>
+          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+          <td class="sp-col-add"></td>
+        </tr>
+      </tbody>
+    </table>
 
   </div>
 
   <!-- Bootstrap JS -->
-  <script src="./dist/js/home-page.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
