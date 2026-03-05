@@ -1,2 +1,328 @@
 // Home page styles
 @import "master-page";
+
+// SharePoint/OneDrive Classic Colors
+$sp-text: #333333;
+$sp-text-light: #666666;
+$sp-head-border: #d6d6d6;
+$sp-border: #e5e5e5;
+$sp-bg: #f4f4f4;
+$sp-bg-light: #ffffff;
+$sp-pink: #b4009e;
+$sp-green: #217346;
+$sp-folder: #a6a6a6;
+$sp-excel: #217346;
+$sp-mobile-menu-bg: #f3f3f3;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  background: #fff;
+  color: $sp-text;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.sp-container {
+  max-width: 100%;
+}
+
+/* ============ TOOLBAR (Desktop) ============ */
+.sp-toolbar {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background-color: $sp-bg;
+}
+
+.sp-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: $sp-text;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $sp-bg-light;
+  }
+}
+
+.sp-icon-pink {
+  color: $sp-pink;
+  font-size: 16px;
+}
+
+.sp-icon-green {
+  color: $sp-green;
+  font-size: 16px;
+}
+
+.sp-chevron {
+  font-size: 14px;
+  color: $sp-text-light;
+  margin: 2px 0 0 2px;
+}
+
+.sp-dots {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: $sp-text;
+}
+
+/* ============ MOBILE HEADER ============ */
+.sp-mobile-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 16px;
+  background-color: $sp-bg;
+  font-family: Arial, sans-serif;
+}
+
+#mobileMenu {
+  border-top: 2px solid $sp-border;
+}
+
+.sp-hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 32px;
+  background: #f0f0f0;
+  border: 1px solid #bbb;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 6px;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+/* ============ MOBILE MENU ============ */
+.sp-mobile-menu {
+  background: $sp-bg;
+  font-family: Arial, sans-serif;
+}
+
+.sp-mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  color: $sp-text;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 400;
+
+  &:hover {
+    background: #b8b8b8;
+    color: #000000;
+    font-weight: 500;
+  }
+
+  iconify-icon:first-child {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  .sp-chevron {
+    font-size: 10px;
+    color: $sp-text-light;
+    margin-left: 2px;
+  }
+}
+
+/* ============ TITLE ============ */
+.sp-title {
+  font-size: 28px;
+  font-weight: 100;
+  color: $sp-text;
+  margin: 20px 0 24px 24px;
+  padding: 0;
+
+  @media (max-width: 767px) {
+    font-size: 22px;
+    margin: 16px 0 0px 16px;
+  }
+}
+
+/* ============ TABLE (Desktop) ============ */
+.sp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+
+  thead {
+    tr {
+      border-bottom: 2px solid $sp-head-border;
+    }
+
+    th {
+      font-weight: 400;
+      font-size: 14px;
+      color: $sp-text-light;
+      padding: 8px 12px 8px 0;
+      text-align: left;
+      vertical-align: middle;
+      border: none;
+      background: transparent;
+
+      &.col-icon {
+        width: 58px;
+        padding-left: 32px;
+      }
+
+      .th-icon {
+        font-size: 18px;
+        color: $sp-text-light;
+      }
+
+      .th-text {
+        color: $sp-text;
+      }
+
+      .th-chevron {
+        font-size: 14px;
+        color: $sp-text-light;
+        margin: 2px 0 0 2px;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $sp-border;
+      background-color: transparent;
+
+      &:hover {
+        background-color: $sp-bg !important;
+
+        td {
+          background-color: $sp-bg;
+        }
+      }
+    }
+
+    td {
+      padding: 14px 12px 14px 0;
+      font-size: 14px;
+      color: $sp-text;
+      border: none;
+      vertical-align: middle;
+
+      &.col-icon {
+        width: 58px;
+        padding-left: 32px;
+        text-align: center;
+      }
+
+      &:nth-child(3),
+      &:nth-child(4) {
+        color: $sp-text-light;
+      }
+    }
+
+    .name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+
+      .sp-icon-pink {
+        position: absolute;
+        top: 10px;
+        left: -8px;
+        font-size: 10px;
+      }
+    }
+  }
+}
+
+.folder-icon {
+  font-size: 18px;
+  color: $sp-folder;
+}
+
+.excel-icon {
+  font-size: 18px;
+  color: $sp-excel;
+}
+
+/* ============ MOBILE CARD LIST ============ */
+.sp-mobile-list {
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.sp-mobile-card {
+  padding: 0;
+  border: 1px solid $sp-head-border;
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sp-card-row {
+  background-color: $sp-bg-light;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid $sp-border;
+
+  &:first-child {
+    background-color: $sp-bg;
+    justify-content: space-between;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.sp-card-label {
+  font-size: 13px;
+  color: $sp-text-light;
+  font-weight: bold;
+  font-style: italic;
+  width: 25%;
+}
+
+.sp-card-value {
+  font-size: 13px;
+  color: $sp-text;
+  text-align: right;
+  word-break: break-word;
+  max-width: 65%;
+
+  iconify-icon {
+    font-size: 18px;
+  }
+
+  .sp-icon-pink {
+    font-size: 12px;
+    margin-right: 4px;
+  }
+}
