@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Documents</title>
@@ -11,262 +12,122 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="./dist/css/home-page.css" rel="stylesheet">
+
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
 </head>
-<script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
 <body>
 
-<div class="sp-container">
+  <div class="sp-container">
 
-  <!-- Desktop Toolbar -->
-  <div class="sp-toolbar d-none d-md-flex align-items-center">
-    <button class="sp-btn">
-      <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon> New <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-    </button>
-    <button class="sp-btn">
-      <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon> Upload <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-    </button>
-    <button class="sp-btn">
-      <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon> Sync
-    </button>
-    <button class="sp-btn">
-      <iconify-icon icon="vscode-icons:file-type-excel2" class="sp-icon-green"></iconify-icon> Export to Excel
-    </button>
-    <button class="sp-btn">
-      <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon> Flow <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-    </button>
-    <button class="sp-btn">
-      <iconify-icon icon="fluent-mdl2:more"></iconify-icon>
-    </button>
-  </div>
-
-  <!-- Mobile Header with Hamburger -->
-  <div class="sp-mobile-header d-md-none">
-    <button class="sp-hamburger-btn" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" aria-expanded="false">
-      <iconify-icon icon="pajamas:hamburger"></iconify-icon>
-    </button>
-  </div>
-
-  <!-- Mobile Dropdown Menu -->
-  <div class="collapse d-md-none" id="mobileMenu">
-    <div class="sp-mobile-menu">
-      <a href="#" class="sp-mobile-menu-item">
-        <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon>
-        <span>New <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
-      </a>
-      <a href="#" class="sp-mobile-menu-item">
-        <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon>
-        <span>Upload <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
-      </a>
-      <a href="#" class="sp-mobile-menu-item">
-        <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon>
-        <span>Sync</span>
-      </a>
-      <a href="#" class="sp-mobile-menu-item">
-        <iconify-icon icon="vscode-icons:file-type-excel2"></iconify-icon>
-        <span>Export to Excel</span>
-      </a>
-      <a href="#" class="sp-mobile-menu-item">
-        <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon>
-        <span>Flow</span>
-      </a>
-      <a href="#" class="sp-mobile-menu-item">
-        <span class="sp-dots">...</span>
-      </a>
+    <!-- Desktop Toolbar -->
+    <div class="sp-toolbar d-none d-md-flex align-items-center">
+      <button class="sp-btn">
+        <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon> New <iconify-icon
+          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+      </button>
+      <button class="sp-btn">
+        <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon> Upload <iconify-icon
+          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+      </button>
+      <button class="sp-btn">
+        <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon> Sync
+      </button>
+      <button class="sp-btn">
+        <iconify-icon icon="vscode-icons:file-type-excel2" class="sp-icon-green"></iconify-icon> Export to Excel
+      </button>
+      <button class="sp-btn">
+        <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon> Flow <iconify-icon
+          icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+      </button>
+      <button class="sp-btn">
+        <iconify-icon icon="fluent-mdl2:more"></iconify-icon>
+      </button>
     </div>
-  </div>
 
-  <!-- Title -->
-  <h1 class="sp-title">Documents</h1>
+    <!-- Mobile Header with Hamburger -->
+    <div class="sp-mobile-header d-md-none">
+      <button class="sp-hamburger-btn" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+        aria-expanded="false">
+        <iconify-icon icon="pajamas:hamburger"></iconify-icon>
+      </button>
+    </div>
 
-  <!-- Desktop Table -->
-  <div class="table-responsive d-none d-md-block ms-4">
-    <table class="table sp-table">
-      <thead>
-        <tr>
-          <th class="col-icon">            
-            <iconify-icon icon="fluent-mdl2:page" class="th-icon"></iconify-icon>
-          </th>
-          <th>
-            <span class="th-text">Name</span>
-            <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-          </th>
-          <th>
-            <span class="th-text">Modified</span>
-            <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-          </th>
-          <th>
-            <span class="th-text">Modified By</span>
-            <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
-          </th>
-          <th>
-            <iconify-icon icon="fluent-mdl2:add"></iconify-icon>
-            <span class="th-text">Add column</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="col-icon"><iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon></td>
-          <td class="name-cell">
-            <span>CAS</span>
-          </td>
-          <td>April 30</td>
-          <td>Megan Bowen</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="col-icon"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></td>
-          <td class="name-cell">
-            <iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>
-            <span>CoasterAndBargeLoading.xlsx</span>
-          </td>
-          <td>A few seconds ago</td>
-          <td>Administrator MOD</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="col-icon"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></td>
-          <td class="name-cell">
-            <iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>
-            <span>RevenueByServices.xlsx</span>
-          </td>
-          <td>A few seconds ago</td>
-          <td>Administrator MOD</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="col-icon"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></td>
-          <td class="name-cell">
-            <iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>
-            <span>RevenueByServices2016.xlsx</span>
-          </td>
-          <td>A few seconds ago</td>
-          <td>Administrator MOD</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="col-icon"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></td>
-          <td class="name-cell">
-            <iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>
-            <span>RevenueByServices2017.xlsx</span>
-          </td>
-          <td>A few seconds ago</td>
-          <td>Administrator MOD</td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Mobile Card List -->
-  <div class="d-md-none sp-mobile-list">
-
-    <!-- CAS Folder -->
-    <div class="sp-mobile-card">
-      <div class="sp-card-row">
-        <span class="sp-card-label">File Type</span>
-        <span class="sp-card-value"><iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon></span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Name</span>
-        <span class="sp-card-value">CAS</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified</span>
-        <span class="sp-card-value">April 30</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified By</span>
-        <span class="sp-card-value">Megan Bowen</span>
+    <!-- Mobile Dropdown Menu -->
+    <div class="collapse d-md-none" id="mobileMenu">
+      <div class="sp-mobile-menu">
+        <a href="#" class="sp-mobile-menu-item">
+          <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon>
+          <span>New <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
+        </a>
+        <a href="#" class="sp-mobile-menu-item">
+          <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon>
+          <span>Upload <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon></span>
+        </a>
+        <a href="#" class="sp-mobile-menu-item">
+          <iconify-icon icon="fluent-mdl2:sync-to-p-c" class="sp-icon-pink"></iconify-icon>
+          <span>Sync</span>
+        </a>
+        <a href="#" class="sp-mobile-menu-item">
+          <iconify-icon icon="vscode-icons:file-type-excel2"></iconify-icon>
+          <span>Export to Excel</span>
+        </a>
+        <a href="#" class="sp-mobile-menu-item">
+          <iconify-icon icon="fluent-mdl2:flow" class="sp-icon-pink"></iconify-icon>
+          <span>Flow</span>
+        </a>
+        <a href="#" class="sp-mobile-menu-item">
+          <span class="sp-dots">...</span>
+        </a>
       </div>
     </div>
 
-    <!-- CoasterAndBargeLoading.xlsx -->
-    <div class="sp-mobile-card">
-      <div class="sp-card-row">
-        <span class="sp-card-label">File Type</span>
-        <span class="sp-card-value"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Name</span>
-        <span class="sp-card-value"><iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>CoasterAndBargeLoading.xlsx</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified</span>
-        <span class="sp-card-value">A few seconds ago</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified By</span>
-        <span class="sp-card-value">Administrator MOD</span>
-      </div>
+    <!-- Title -->
+    <h1 class="sp-title">Documents</h1>
+
+    <!-- Desktop Table -->
+    <div class="table-responsive d-none d-md-block ms-4">
+      <table class="table sp-table">
+        <thead>
+          <tr>
+            <th class="col-icon">
+              <iconify-icon icon="fluent-mdl2:page" class="th-icon"></iconify-icon>
+            </th>
+            <th>
+              <span class="th-text">Name</span>
+              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
+            </th>
+            <th>
+              <span class="th-text">Modified</span>
+              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
+            </th>
+            <th>
+              <span class="th-text">Modified By</span>
+              <iconify-icon icon="fluent-mdl2:chevron-down" class="th-chevron"></iconify-icon>
+            </th>
+            <th>
+              <iconify-icon icon="fluent-mdl2:add"></iconify-icon>
+              <span class="th-text">Add column</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rendered dynamically by JavaScript -->
+        </tbody>
+      </table>
     </div>
 
-    <!-- RevenueByServices.xlsx -->
-    <div class="sp-mobile-card">
-      <div class="sp-card-row">
-        <span class="sp-card-label">File Type</span>
-        <span class="sp-card-value"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Name</span>
-        <span class="sp-card-value"><iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>RevenueByServices</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified</span>
-        <span class="sp-card-value">A few seconds ago</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified By</span>
-        <span class="sp-card-value">Administrator MOD</span>
-      </div>
-    </div>
-
-    <!-- RevenueByServices2016.xlsx -->
-    <div class="sp-mobile-card">
-      <div class="sp-card-row">
-        <span class="sp-card-label">File Type</span>
-        <span class="sp-card-value"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Name</span>
-        <span class="sp-card-value"><iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>RevenueByServices2016</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified</span>
-        <span class="sp-card-value">A few seconds ago</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified By</span>
-        <span class="sp-card-value">Administrator MOD</span>
-      </div>
-    </div>
-
-    <!-- RevenueByServices2017.xlsx -->
-    <div class="sp-mobile-card">
-      <div class="sp-card-row">
-        <span class="sp-card-label">File Type</span>
-        <span class="sp-card-value"><iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon></span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Name</span>
-        <span class="sp-card-value"><iconify-icon icon="fluent-mdl2:glimmer" class="sp-icon-pink"></iconify-icon>RevenueByServices2017</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified</span>
-        <span class="sp-card-value">A few seconds ago</span>
-      </div>
-      <div class="sp-card-row">
-        <span class="sp-card-label">Modified By</span>
-        <span class="sp-card-value">Administrator MOD</span>
-      </div>
+    <!-- Mobile Card List -->
+    <div class="d-md-none sp-mobile-list">
+      <!-- Rendered dynamically by JavaScript -->
     </div>
 
   </div>
 
-</div>
-
-<!-- Bootstrap JS -->
- <script src="./dist/js/home-page.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="./dist/js/home-page.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

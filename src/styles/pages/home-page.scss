@@ -1,28 +1,16 @@
 // Home page styles
-@import "master-page";
-
-// SharePoint/OneDrive Classic Colors
-$sp-text: #333333;
-$sp-text-light: #666666;
-$sp-head-border: #d6d6d6;
-$sp-border: #e5e5e5;
-$sp-bg: #f4f4f4;
-$sp-bg-light: #ffffff;
-$sp-pink: #b4009e;
-$sp-green: #217346;
-$sp-folder: #a6a6a6;
-$sp-excel: #217346;
-$sp-mobile-menu-bg: #f3f3f3;
+@import 'master-page';
+@import '../utilities/variables';
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
-  background: #fff;
+  font-family: $font-family-base;
+  background: $sp-bg-light;
   color: $sp-text;
-  font-size: 14px;
+  font-size: $font-size-base;
   margin: 0;
   padding: 0;
 }
@@ -43,14 +31,14 @@ body {
 .sp-btn {
   background: transparent;
   border: none;
-  padding: 8px 12px;
-  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
   font-weight: 400;
   color: $sp-text;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
+  gap: $spacing-xs;
   white-space: nowrap;
 
   &:hover {
@@ -60,22 +48,22 @@ body {
 
 .sp-icon-pink {
   color: $sp-pink;
-  font-size: 16px;
+  font-size: $icon-size-base;
 }
 
 .sp-icon-green {
   color: $sp-green;
-  font-size: 16px;
+  font-size: $icon-size-base;
 }
 
 .sp-chevron {
-  font-size: 14px;
+  font-size: $font-size-base;
   color: $sp-text-light;
   margin: 2px 0 0 2px;
 }
 
 .sp-dots {
-  font-size: 18px;
+  font-size: $icon-size-lg;
   font-weight: bold;
   letter-spacing: 2px;
   color: $sp-text;
@@ -85,9 +73,9 @@ body {
 .sp-mobile-header {
   display: flex;
   justify-content: flex-end;
-  padding: 16px 16px;
+  padding: $spacing-lg;
   background-color: $sp-bg;
-  font-family: Arial, sans-serif;
+  font-family: $font-family-fallback;
 }
 
 #mobileMenu {
@@ -96,17 +84,17 @@ body {
 
 .sp-hamburger-btn {
   display: flex;
+  align-items: center;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   gap: 5px;
   width: 40px;
   height: 32px;
-  background: #f0f0f0;
+  background: $sp-bg;
   border: 1px solid #bbb;
   border-radius: 2px;
   cursor: pointer;
-  padding: 6px;
+  padding: $spacing-xs;
 
   &:hover {
     background: #e0e0e0;
@@ -116,17 +104,17 @@ body {
 /* ============ MOBILE MENU ============ */
 .sp-mobile-menu {
   background: $sp-bg;
-  font-family: Arial, sans-serif;
+  font-family: $font-family-fallback;
 }
 
 .sp-mobile-menu-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
+  gap: $spacing-sm;
+  padding: $spacing-sm 20px;
   color: $sp-text;
   text-decoration: none;
-  font-size: 16px;
+  font-size: $font-size-lg;
   font-weight: 400;
 
   &:hover {
@@ -136,7 +124,7 @@ body {
   }
 
   iconify-icon:first-child {
-    font-size: 16px;
+    font-size: $icon-size-base;
     width: 20px;
     text-align: center;
     flex-shrink: 0;
@@ -147,7 +135,7 @@ body {
   }
 
   .sp-chevron {
-    font-size: 10px;
+    font-size: $icon-size-sm;
     color: $sp-text-light;
     margin-left: 2px;
   }
@@ -155,15 +143,15 @@ body {
 
 /* ============ TITLE ============ */
 .sp-title {
-  font-size: 28px;
+  font-size: $font-size-title;
   font-weight: 100;
   color: $sp-text;
-  margin: 20px 0 24px 24px;
+  margin: 20px 0 $spacing-xl $spacing-xl;
   padding: 0;
 
-  @media (max-width: 767px) {
-    font-size: 22px;
-    margin: 16px 0 0px 16px;
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-title-mobile;
+    margin: $spacing-lg 0 0 $spacing-lg;
   }
 }
 
@@ -260,25 +248,30 @@ body {
 }
 
 .folder-icon {
-  font-size: 18px;
+  font-size: $icon-size-lg;
   color: $sp-folder;
 }
 
 .excel-icon {
-  font-size: 18px;
+  font-size: $icon-size-lg;
   color: $sp-excel;
+}
+
+.word-icon {
+  font-size: $icon-size-lg;
+  color: $sp-word;
 }
 
 /* ============ MOBILE CARD LIST ============ */
 .sp-mobile-list {
-  padding: 16px;
-  font-family: Arial, sans-serif;
+  padding: $spacing-lg;
+  font-family: $font-family-fallback;
 }
 
 .sp-mobile-card {
   padding: 0;
   border: 1px solid $sp-head-border;
-  margin-bottom: 24px;
+  margin-bottom: $spacing-xl;
 
   &:last-child {
     margin-bottom: 0;
@@ -286,10 +279,10 @@ body {
 }
 
 .sp-card-row {
-  background-color: $sp-bg-light;
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  background-color: $sp-bg-light;
+  padding: 10px $spacing-md;
   border-bottom: 1px solid $sp-border;
 
   &:first-child {
@@ -303,7 +296,7 @@ body {
 }
 
 .sp-card-label {
-  font-size: 13px;
+  font-size: $font-size-sm;
   color: $sp-text-light;
   font-weight: bold;
   font-style: italic;
@@ -311,18 +304,17 @@ body {
 }
 
 .sp-card-value {
-  font-size: 13px;
+  font-size: $font-size-sm;
   color: $sp-text;
+  display: flex;
   text-align: right;
   word-break: break-word;
   max-width: 65%;
 
-  iconify-icon {
-    font-size: 18px;
-  }
-
   .sp-icon-pink {
-    font-size: 12px;
-    margin-right: 4px;
+    font-size: $icon-size-sm;
+    position: relative;
+    top: -4px;
+    left: 0;
   }
 }
