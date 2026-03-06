@@ -86,9 +86,6 @@ body {
 }
 
 @media (max-width: 767px) {
-  .sp-nav-more iconify-icon {
-    display: none;
-  }
   .sp-nav-more::after {
     content: "...";
     font-size: 18px;
@@ -110,7 +107,7 @@ body {
 .sp-chevron {
   font-size: 14px;
   color: #666666;
-  margin: 2px 0 0 2px;
+  vertical-align: -2px;
 }
 
 .sp-title {
@@ -152,9 +149,6 @@ body {
   font-size: 14px;
   color: #333333;
   vertical-align: middle;
-}
-.sp-table thead th .sp-chevron {
-  margin-left: 4px;
 }
 .sp-table tbody tr {
   border-bottom: 1px solid #e5e5e5;

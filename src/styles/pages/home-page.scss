@@ -93,10 +93,6 @@ body {
 
 .sp-nav-more {
   @media (max-width: $breakpoint-md) {
-    iconify-icon {
-      display: none;
-    }
-
     &::after {
       content: '...';
       font-size: $icon-size-lg;
@@ -120,7 +116,7 @@ body {
 .sp-chevron {
   font-size: $font-size-base;
   color: $sp-text-light;
-  margin: 2px 0 0 2px;
+  vertical-align: -2px;
 }
 
 // ============ TITLE ============
@@ -164,10 +160,6 @@ body {
       font-size: $font-size-base;
       color: $sp-text;
       vertical-align: middle;
-
-      .sp-chevron {
-        margin-left: 4px;
-      }
     }
   }
 
