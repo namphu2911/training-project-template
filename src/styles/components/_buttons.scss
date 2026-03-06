@@ -1,1 +1,61 @@
 // Button Styles
+
+// Toggler button (mobile)
+.sp-toggler {
+  border: 1px solid $sp-border;
+  border-radius: 2px;
+  padding: $spacing-xs $spacing-md;
+  display: flex;
+  margin: $spacing-sm $spacing-md $spacing-sm auto;
+  background: $sp-bg;
+
+  &:hover {
+    background: $sp-bg-hover;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.sp-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 400;
+  color: $sp-text;
+  white-space: nowrap;
+
+  &:hover {
+    background: $sp-bg-light;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+    padding: $spacing-sm $spacing-xl;
+    font-size: $font-size-lg;
+    justify-content: flex-start;
+
+    &:hover {
+      background: $sp-bg-hover;
+      color: $sp-text-dark;
+      font-weight: 500;
+    }
+  }
+}
+
+.sp-nav-more {
+  @media (max-width: $breakpoint-md) {
+    &::after {
+      content: '...';
+      font-size: $icon-size-lg;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+  }
+}

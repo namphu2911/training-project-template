@@ -1,1 +1,17 @@
 // Custom Reset/Normalize
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family-base;
+  background: $sp-bg-light;
+  color: $sp-text;
+  font-size: $font-size-base;
+  margin: 0;
+  padding: 0;
+
+  @media (max-width: $breakpoint-md) {
+    font-family: $font-family-fallback; // Arial on mobile
+  }
+}

@@ -1,0 +1,40 @@
+// Icon colors
+.sp-icon-pink {
+  color: $sp-pink;
+  font-size: $icon-size-base;
+}
+
+.sp-icon-green {
+  color: $sp-green;
+  font-size: $icon-size-base;
+}
+
+.sp-chevron {
+  font-size: $font-size-base;
+  color: $sp-text-light;
+  vertical-align: -2px;
+}
+
+.sp-glimmer {
+  color: $sp-pink;
+  font-size: $icon-size-sm;
+}
+
+.folder-icon {
+  font-size: $icon-size-lg;
+  color: $sp-folder;
+
+  @media (max-width: $breakpoint-md) {
+    color: $sp-text;
+  }
+}
+
+.excel-icon {
+  font-size: $icon-size-lg;
+  color: $sp-green;
+}
+
+.word-icon {
+  font-size: $icon-size-lg;
+  color: $sp-blue;
+}

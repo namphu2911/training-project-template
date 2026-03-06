@@ -20,9 +20,8 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md sp-navbar">
       <div class="container-fluid px-0">
-        <button class="navbar-toggler ms-auto sp-toggler" type="button" 
-                data-bs-toggle="collapse" data-bs-target="#spNavbar" 
-                aria-controls="spNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler sp-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#spNavbar"
+          aria-controls="spNavbar" aria-expanded="false" aria-label="Toggle navigation">
           <iconify-icon icon="pajamas:hamburger"></iconify-icon>
         </button>
 
@@ -71,111 +70,113 @@
       </div>
     </nav>
 
-    <!-- title -->
-    <h1 class="sp-title">Documents</h1>
+    <main class="sp-main">
+      <!-- title -->
+      <h1 class="sp-title">Documents</h1>
 
-    <!-- table -->
-    <table class="sp-table">
-      <thead>
-        <tr>
-          <th class="sp-col-icon">
-            <iconify-icon icon="fluent-mdl2:page"></iconify-icon>
-          </th>
-          <th class="sp-col-name">
-            Name <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-          </th>
-          <th class="sp-col-modified">
-            Modified <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-          </th>
-          <th class="sp-col-modified-by">
-            Modified By <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
-          </th>
-          <th class="sp-col-add">
-            <iconify-icon icon="fluent-mdl2:add"></iconify-icon> Add column
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Row 1: Folder -->
-        <tr>
-          <td class="sp-col-icon" data-label="File Type">
-            <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
-          </td>
-          <td class="sp-col-name" data-label="Name">
-            <span class="sp-name-content">
-              <span class="sp-value">CAS</span>
-            </span>
-          </td>
-          <td class="sp-col-modified" data-label="Modified">April 30</td>
-          <td class="sp-col-modified-by" data-label="Modified By">Megan Bowen</td>
-          <td class="sp-col-add"></td>
-        </tr>
+      <!-- table -->
+      <table class="sp-table">
+        <thead>
+          <tr>
+            <th class="sp-col-icon">
+              <iconify-icon icon="fluent-mdl2:page"></iconify-icon>
+            </th>
+            <th class="sp-col-name">
+              Name <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+            </th>
+            <th class="sp-col-modified">
+              Modified <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+            </th>
+            <th class="sp-col-modified-by">
+              Modified By <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+            </th>
+            <th class="sp-col-add">
+              <iconify-icon icon="fluent-mdl2:add"></iconify-icon> Add column
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1: Folder -->
+          <tr>
+            <td class="sp-col-icon" data-label="File Type">
+              <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
+            </td>
+            <td class="sp-col-name" data-label="Name">
+              <span class="sp-name-content">
+                <span class="sp-value">CAS</span>
+              </span>
+            </td>
+            <td class="sp-col-modified" data-label="Modified">April 30</td>
+            <td class="sp-col-modified-by" data-label="Modified By">Megan Bowen</td>
+            <td class="sp-col-add"></td>
+          </tr>
 
-        <!-- Row 2: Excel with glimmer -->
-        <tr>
-          <td class="sp-col-icon" data-label="File Type">
-            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-          </td>
-          <td class="sp-col-name" data-label="Name">
-            <span class="sp-name-content">
-              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-              <span class="sp-value">CoasterAndBargeLoading.xlsx</span>
-            </span>
-          </td>
-          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-          <td class="sp-col-add"></td>
-        </tr>
+          <!-- Row 2: Excel with glimmer -->
+          <tr>
+            <td class="sp-col-icon" data-label="File Type">
+              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+            </td>
+            <td class="sp-col-name" data-label="Name">
+              <span class="sp-name-content">
+                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+                <span class="sp-value">CoasterAndBargeLoading.xlsx</span>
+              </span>
+            </td>
+            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+            <td class="sp-col-add"></td>
+          </tr>
 
-        <!-- Row 3: Excel with glimmer -->
-        <tr>
-          <td class="sp-col-icon" data-label="File Type">
-            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-          </td>
-          <td class="sp-col-name" data-label="Name">
-            <span class="sp-name-content">
-              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-              <span class="sp-value">RevenueByServices.xlsx</span>
-            </span>
-          </td>
-          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-          <td class="sp-col-add"></td>
-        </tr>
+          <!-- Row 3: Excel with glimmer -->
+          <tr>
+            <td class="sp-col-icon" data-label="File Type">
+              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+            </td>
+            <td class="sp-col-name" data-label="Name">
+              <span class="sp-name-content">
+                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+                <span class="sp-value">RevenueByServices.xlsx</span>
+              </span>
+            </td>
+            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+            <td class="sp-col-add"></td>
+          </tr>
 
-        <!-- Row 4: Excel with glimmer -->
-        <tr>
-          <td class="sp-col-icon" data-label="File Type">
-            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-          </td>
-          <td class="sp-col-name" data-label="Name">
-            <span class="sp-name-content">
-              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-              <span class="sp-value">RevenueByServices2016.xlsx</span>
-            </span>
-          </td>
-          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-          <td class="sp-col-add"></td>
-        </tr>
+          <!-- Row 4: Excel with glimmer -->
+          <tr>
+            <td class="sp-col-icon" data-label="File Type">
+              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+            </td>
+            <td class="sp-col-name" data-label="Name">
+              <span class="sp-name-content">
+                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+                <span class="sp-value">RevenueByServices2016.xlsx</span>
+              </span>
+            </td>
+            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+            <td class="sp-col-add"></td>
+          </tr>
 
-        <!-- Row 5: Excel with glimmer -->
-        <tr>
-          <td class="sp-col-icon" data-label="File Type">
-            <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-          </td>
-          <td class="sp-col-name" data-label="Name">
-            <span class="sp-name-content">
-              <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-              <span class="sp-value">RevenueByServices2017.xlsx</span>
-            </span>
-          </td>
-          <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-          <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-          <td class="sp-col-add"></td>
-        </tr>
-      </tbody>
-    </table>
+          <!-- Row 5: Excel with glimmer -->
+          <tr>
+            <td class="sp-col-icon" data-label="File Type">
+              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
+            </td>
+            <td class="sp-col-name" data-label="Name">
+              <span class="sp-name-content">
+                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
+                <span class="sp-value">RevenueByServices2017.xlsx</span>
+              </span>
+            </td>
+            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
+            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
+            <td class="sp-col-add"></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
 
   </div>
 

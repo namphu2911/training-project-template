@@ -1,0 +1,148 @@
+.sp-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    @media (max-width: $breakpoint-md) {
+      display: none; // Hide header on mobile
+    }
+
+    tr {
+      border-bottom: 2px solid $sp-border;
+    }
+
+    th {
+      padding: $spacing-sm $spacing-xl $spacing-sm 0;
+      font-weight: 400;
+      color: $sp-text;
+      vertical-align: middle;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $sp-border;
+
+      &:hover {
+        background-color: $sp-bg;
+      }
+
+      @media (max-width: $breakpoint-md) {
+        display: block;
+        border: 1px solid $sp-border;
+        margin-bottom: $spacing-xl;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+
+    td {
+      padding: $spacing-lg $spacing-xl $spacing-lg 0;
+      font-size: $font-size-base;
+      color: $sp-text;
+      vertical-align: middle;
+
+      &:nth-child(3),
+      &:nth-child(4) {
+        color: $sp-text-light;
+      }
+
+      @media (max-width: $breakpoint-md) {
+        display: flex;
+        align-items: center;
+        padding: $spacing-sm;
+        border-bottom: 1px solid $sp-border;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        // Show label from data-label attribute
+        &::before {
+          content: attr(data-label);
+          color: $sp-text-light;
+          font-weight: bold;
+          font-style: italic;
+          width: 30%;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+// Column widths
+.sp-col-icon {
+  width: 5%;
+  padding-left: $spacing-xxl;
+  text-align: right;
+
+  iconify-icon {
+    font-size: $icon-size-lg;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    background-color: $sp-bg;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+.sp-col-name {
+  width: 35%;
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+  }
+}
+
+.sp-col-modified,
+.sp-col-modified-by {
+  width: 20%;
+  color: $sp-text-light;
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
+    color: $sp-text;
+  }
+}
+
+.sp-col-add {
+  width: 15%;
+
+  @media (max-width: $breakpoint-md) {
+    display: none;
+    padding: 0 !important;
+  }
+}
+
+.sp-name-content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .sp-glimmer {
+    position: absolute;
+    top: -4px;
+    left: -8px;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    width: 70%;
+    display: flex;
+    align-items: flex-start;
+
+    .sp-glimmer {
+      position: static;
+      flex-shrink: 0;
+      margin-top: -2px;
+    }
+  }
+}

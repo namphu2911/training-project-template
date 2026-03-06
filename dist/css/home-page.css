@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
   background: #ffffff;
   color: #333333;
   font-size: 14px;
@@ -15,7 +15,26 @@ body {
 }
 @media (max-width: 767px) {
   body {
-    font-family: Arial, sans-serif;
+    font-family: "Arial Narrow", sans-serif;
+  }
+}
+
+.sp-navbar {
+  background-color: #f3f3f3;
+  padding: 0;
+}
+.sp-navbar .container-fluid {
+  padding: 0;
+}
+
+.sp-navbar .navbar-nav {
+  padding: 8px;
+}
+@media (max-width: 767px) {
+  .sp-navbar .navbar-nav {
+    border-top: 2px solid #e5e5e5;
+    padding: 0;
+    gap: 0;
   }
 }
 
@@ -23,42 +42,29 @@ body {
   max-width: 100%;
 }
 
-.sp-navbar {
-  background-color: #f4f4f4;
-  padding: 8px 0;
-}
-.sp-navbar .container-fluid {
-  padding: 0;
+.sp-main {
+  margin-left: 24px;
 }
 
 .sp-toggler {
   border: 1px solid #e5e5e5;
   border-radius: 2px;
-  padding: 6px;
-  margin-right: 16px;
-  background: #f4f4f4;
+  padding: 6px 12px;
+  display: flex;
+  margin: 8px 12px 8px auto;
+  background: #f3f3f3;
 }
 .sp-toggler:hover {
-  background: #e0e0e0;
+  background: #cccccc;
 }
 .sp-toggler:focus {
   box-shadow: none;
 }
 
-.sp-navbar .navbar-nav {
-  gap: 0;
-}
-@media (max-width: 767px) {
-  .sp-navbar .navbar-nav {
-    border-top: 2px solid #e5e5e5;
-    padding: 0;
-  }
-}
-
 .sp-nav-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 8px 12px;
   background: transparent;
   border: none;
@@ -74,12 +80,12 @@ body {
 @media (max-width: 767px) {
   .sp-nav-btn {
     width: 100%;
-    padding: 8px 20px;
+    padding: 8px 24px;
     font-size: 16px;
     justify-content: flex-start;
   }
   .sp-nav-btn:hover {
-    background: #b8b8b8;
+    background: #cccccc;
     color: #000000;
     font-weight: 500;
   }
@@ -110,30 +116,34 @@ body {
   vertical-align: -2px;
 }
 
-.sp-title {
-  font-size: 28px;
-  font-weight: 100;
-  color: #333333;
-  margin: 20px 0 24px 24px;
-  padding: 0;
+.sp-glimmer {
+  color: #b4009e;
+  font-size: 10px;
+}
+
+.folder-icon {
+  font-size: 18px;
+  color: #a6a6a6;
 }
 @media (max-width: 767px) {
-  .sp-title {
-    font-size: 22px;
-    margin: 16px;
+  .folder-icon {
+    color: #333333;
   }
+}
+
+.excel-icon {
+  font-size: 18px;
+  color: #217346;
+}
+
+.word-icon {
+  font-size: 18px;
+  color: #2b579a;
 }
 
 .sp-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0 24px;
-}
-@media (max-width: 767px) {
-  .sp-table {
-    margin: 16px;
-    width: calc(100% - 32px);
-  }
 }
 @media (max-width: 767px) {
   .sp-table thead {
@@ -141,12 +151,11 @@ body {
   }
 }
 .sp-table thead tr {
-  border-bottom: 2px solid #d6d6d6;
+  border-bottom: 2px solid #e5e5e5;
 }
 .sp-table thead th {
   padding: 8px 24px 8px 0;
   font-weight: 400;
-  font-size: 14px;
   color: #333333;
   vertical-align: middle;
 }
@@ -154,12 +163,12 @@ body {
   border-bottom: 1px solid #e5e5e5;
 }
 .sp-table tbody tr:hover {
-  background-color: #f4f4f4;
+  background-color: #f3f3f3;
 }
 @media (max-width: 767px) {
   .sp-table tbody tr {
     display: block;
-    border: 1px solid #d6d6d6;
+    border: 1px solid #e5e5e5;
     margin-bottom: 24px;
   }
   .sp-table tbody tr:last-child {
@@ -170,7 +179,7 @@ body {
   }
 }
 .sp-table tbody td {
-  padding: 14px 24px 14px 0;
+  padding: 16px 24px 16px 0;
   font-size: 14px;
   color: #333333;
   vertical-align: middle;
@@ -182,16 +191,14 @@ body {
   .sp-table tbody td {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
+    padding: 8px;
     border-bottom: 1px solid #e5e5e5;
-    background-color: #ffffff;
   }
   .sp-table tbody td:last-child {
     border-bottom: none;
   }
   .sp-table tbody td::before {
     content: attr(data-label);
-    font-size: 13px;
     color: #666666;
     font-weight: bold;
     font-style: italic;
@@ -201,7 +208,7 @@ body {
 }
 
 .sp-col-icon {
-  width: 58px;
+  width: 5%;
   padding-left: 32px;
   text-align: right;
 }
@@ -210,7 +217,7 @@ body {
 }
 @media (max-width: 767px) {
   .sp-col-icon {
-    background-color: #f4f4f4;
+    background-color: #f3f3f3;
     justify-content: space-between;
     width: 100%;
     text-align: left;
@@ -236,7 +243,6 @@ body {
   .sp-col-modified-by {
     width: 100%;
     color: #333333;
-    font-size: 13px;
   }
 }
 
@@ -248,11 +254,6 @@ body {
     display: none;
     padding: 0 !important;
   }
-}
-
-.sp-glimmer {
-  color: #b4009e;
-  font-size: 10px;
 }
 
 .sp-name-content {
@@ -276,24 +277,19 @@ body {
     flex-shrink: 0;
     margin-top: -2px;
   }
-  .sp-name-content .sp-value {
-    font-size: 13px;
+}
+
+.sp-title {
+  font-size: 28px;
+  font-weight: 300;
+  color: #333333;
+  margin: 24px 0;
+  padding: 0;
+}
+@media (max-width: 767px) {
+  .sp-title {
+    font-size: 22px;
   }
-}
-
-.folder-icon {
-  font-size: 18px;
-  color: #a6a6a6;
-}
-
-.excel-icon {
-  font-size: 18px;
-  color: #217346;
-}
-
-.word-icon {
-  font-size: 18px;
-  color: #2b579a;
 }
 
 /*# sourceMappingURL=home-page.css.map*/

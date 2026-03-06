@@ -1,1 +1,22 @@
 // Navigation styles
+
+// Navbar (Override Bootstrap)
+.sp-navbar {
+  background-color: $sp-bg;
+  padding: 0;
+
+  .container-fluid {
+    padding: 0;
+  }
+}
+
+// Menu items
+.sp-navbar .navbar-nav {
+  padding: $spacing-sm;
+
+  @media (max-width: $breakpoint-md) {
+    border-top: 2px solid $sp-border;
+    padding: 0;
+    gap: 0;
+  }
+}

@@ -1,33 +1,28 @@
 // Define variables
-
-// SharePoint/OneDrive Classic Colors
 $sp-text: #333333;
 $sp-text-light: #666666;
-$sp-head-border: #d6d6d6;
-$sp-border: #e5e5e5;
-$sp-bg: #f4f4f4;
-$sp-bg-light: #ffffff;
-$sp-bg-hover: #e0e0e0;
-$sp-bg-hover-dark: #b8b8b8;
 $sp-text-dark: #000000;
+
+$sp-border: #e5e5e5;
+$sp-bg: #f3f3f3;
+$sp-bg-light: #ffffff;
+$sp-bg-hover: #cccccc;
+
 $sp-pink: #b4009e;
 $sp-green: #217346;
+$sp-blue: #2b579a;
 $sp-folder: #a6a6a6;
-$sp-excel: #217346;
-$sp-word: #2b579a;
-$sp-mobile-menu-bg: #f3f3f3;
 
 // Typography
 $font-family-base:
   'Segoe UI',
   'Segoe UI Web (West European)',
-  'Segoe UI',
   -apple-system,
   BlinkMacSystemFont,
   Roboto,
   'Helvetica Neue',
   sans-serif;
-$font-family-fallback: Arial, sans-serif;
+$font-family-fallback: 'Arial Narrow', sans-serif;
 
 // Spacing
 $spacing-xs: 6px;
@@ -35,15 +30,11 @@ $spacing-sm: 8px;
 $spacing-md: 12px;
 $spacing-lg: 16px;
 $spacing-xl: 24px;
-$spacing-table: 14px;
-$spacing-nav: 20px;
+$spacing-xxl: 32px;
 
 // Font sizes
-$font-size-xs: 10px;
-$font-size-sm: 13px;
 $font-size-base: 14px;
 $font-size-lg: 16px;
-$font-size-xl: 18px;
 $font-size-title: 28px;
 $font-size-title-mobile: 22px;
 
