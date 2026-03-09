@@ -28,19 +28,49 @@
         <!-- Menu items -->
         <div class="collapse navbar-collapse" id="spNavbar">
           <ul class="navbar-nav">
-            <li class="nav-item">
-              <button class="nav-link sp-nav-btn">
+            <!-- New dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link sp-nav-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                data-bs-auto-close="true">
                 <iconify-icon icon="fluent-mdl2:add" class="sp-icon-pink"></iconify-icon>
                 <span>New</span>
                 <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
               </button>
+              <ul class="dropdown-menu sp-dropdown">
+                <li>
+                  <button class="dropdown-item sp-dropdown-item" id="btn-new-folder">
+                    <iconify-icon icon="pajamas:folder-new" class="sp-dropdown-icon"></iconify-icon> New folder
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item sp-dropdown-item" id="btn-new-file">
+                    <iconify-icon icon="pajamas:doc-new" class="sp-dropdown-icon"></iconify-icon> New file
+                  </button>
+                </li>
+              </ul>
             </li>
-            <li class="nav-item">
-              <button class="nav-link sp-nav-btn">
+
+            <!-- Upload dropdown -->
+            <li class="nav-item dropdown">
+              <button class="nav-link sp-nav-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                data-bs-auto-close="true">
                 <iconify-icon icon="fluent-mdl2:upload" class="sp-icon-pink"></iconify-icon>
                 <span>Upload</span>
                 <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
               </button>
+              <ul class="dropdown-menu sp-dropdown">
+                <li>
+                  <button class="dropdown-item sp-dropdown-item" id="btn-upload-folder">
+                    <iconify-icon icon="ic:baseline-drive-folder-upload" class="sp-dropdown-icon"></iconify-icon> Upload
+                    folder
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item sp-dropdown-item" id="btn-upload-files">
+                    <iconify-icon icon="ic:baseline-upload-file" class="sp-dropdown-icon"></iconify-icon> Upload files
+                  </button>
+                </li>
+              </ul>
             </li>
             <li class="nav-item">
               <button class="nav-link sp-nav-btn">
@@ -71,8 +101,11 @@
     </nav>
 
     <main class="sp-main">
-      <!-- title -->
-      <h1 class="sp-title">Documents</h1>
+      <!-- Breadcrumb title -->
+      <div class="sp-breadcrumb-bar">
+        <h1 class="sp-title" id="sp-title">Documents</h1>
+        <nav aria-label="breadcrumb" class="sp-breadcrumb-nav" id="sp-breadcrumb"></nav>
+      </div>
 
       <!-- table -->
       <table class="sp-table">
@@ -93,87 +126,13 @@
             <th class="sp-col-add">
               <iconify-icon icon="fluent-mdl2:add"></iconify-icon> Add column
             </th>
+            <th class="sp-col-actions">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
-          <!-- Row 1: Folder -->
-          <tr>
-            <td class="sp-col-icon" data-label="File Type">
-              <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
-            </td>
-            <td class="sp-col-name" data-label="Name">
-              <span class="sp-name-content">
-                <span class="sp-value">CAS</span>
-              </span>
-            </td>
-            <td class="sp-col-modified" data-label="Modified">April 30</td>
-            <td class="sp-col-modified-by" data-label="Modified By">Megan Bowen</td>
-            <td class="sp-col-add"></td>
-          </tr>
-
-          <!-- Row 2: Excel with glimmer -->
-          <tr>
-            <td class="sp-col-icon" data-label="File Type">
-              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-            </td>
-            <td class="sp-col-name" data-label="Name">
-              <span class="sp-name-content">
-                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-                <span class="sp-value">CoasterAndBargeLoading.xlsx</span>
-              </span>
-            </td>
-            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-            <td class="sp-col-add"></td>
-          </tr>
-
-          <!-- Row 3: Excel with glimmer -->
-          <tr>
-            <td class="sp-col-icon" data-label="File Type">
-              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-            </td>
-            <td class="sp-col-name" data-label="Name">
-              <span class="sp-name-content">
-                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-                <span class="sp-value">RevenueByServices.xlsx</span>
-              </span>
-            </td>
-            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-            <td class="sp-col-add"></td>
-          </tr>
-
-          <!-- Row 4: Excel with glimmer -->
-          <tr>
-            <td class="sp-col-icon" data-label="File Type">
-              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-            </td>
-            <td class="sp-col-name" data-label="Name">
-              <span class="sp-name-content">
-                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-                <span class="sp-value">RevenueByServices2016.xlsx</span>
-              </span>
-            </td>
-            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-            <td class="sp-col-add"></td>
-          </tr>
-
-          <!-- Row 5: Excel with glimmer -->
-          <tr>
-            <td class="sp-col-icon" data-label="File Type">
-              <iconify-icon icon="uiw:file-excel" class="excel-icon"></iconify-icon>
-            </td>
-            <td class="sp-col-name" data-label="Name">
-              <span class="sp-name-content">
-                <iconify-icon icon="fluent-mdl2:glimmer" class="sp-glimmer"></iconify-icon>
-                <span class="sp-value">RevenueByServices2017.xlsx</span>
-              </span>
-            </td>
-            <td class="sp-col-modified" data-label="Modified">A few seconds ago</td>
-            <td class="sp-col-modified-by" data-label="Modified By">Administrator MOD</td>
-            <td class="sp-col-add"></td>
-          </tr>
+          <!-- Rows rendered dynamically by JS -->
         </tbody>
       </table>
     </main>
@@ -182,6 +141,7 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./dist/js/home-page.js"></script>
 </body>
 
 </html>

@@ -115,11 +115,20 @@
 }
 
 .sp-col-add {
-  width: 15%;
+  width: 10%;
 
   @media (max-width: $breakpoint-md) {
     display: none;
     padding: 0 !important;
+  }
+}
+
+.sp-col-actions {
+  width: 20%;
+  padding-right: $spacing-xl;
+
+  @media (max-width: $breakpoint-md) {
+    width: 100%;
   }
 }
 
@@ -144,5 +153,49 @@
       flex-shrink: 0;
       margin-top: -2px;
     }
+  }
+}
+
+// Folder name link
+.sp-folder-link {
+  color: $sp-text;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Empty state
+.sp-empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxl * 2;
+  color: $sp-text-light;
+  gap: $spacing-md;
+
+  .sp-empty-icon {
+    font-size: 48px;
+    opacity: 0.4;
+  }
+}
+
+// Loading spinner
+.sp-loading-row td {
+  padding: $spacing-xxl * 2 !important;
+}
+
+.sp-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+
+  .sp-loading-text {
+    color: $sp-text-light;
+    font-size: $font-size-base;
   }
 }

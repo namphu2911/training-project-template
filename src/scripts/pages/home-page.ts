@@ -1,5 +1,6 @@
-// Home page - No dynamic rendering needed
-// Bootstrap handles navbar toggle via data attributes
-// Document list is rendered in HTML with CSS responsive
+import { ready } from '../utilities/_helper';
+import { initHome } from '../components/_home';
 
-console.log('Home page loaded');
+ready(() => {
+  initHome();
+});

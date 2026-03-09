@@ -1,4 +1,8 @@
-const ready = (fn: ()=> void) => {
+const delay = (ms: number) => {
+  new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export const ready = (fn: () => void) => {
   if (document.readyState !== 'loading') {
     fn();
   } else {
@@ -6,4 +10,6 @@ const ready = (fn: ()=> void) => {
   }
 };
 
-export default ready;
+export const randomDelay = (min = 100, max = 200) => {
+  delay(min + Math.floor(Math.random() * (max - min)));
+}

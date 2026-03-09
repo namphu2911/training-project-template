@@ -1,0 +1,39 @@
+// Breadcrumb styles
+.sp-breadcrumb-bar {
+  margin: $spacing-xl 0;
+  padding: 0;
+}
+
+.sp-breadcrumb-nav {
+  .sp-breadcrumb {
+    font-size: $font-size-title-mobile;
+    font-weight: 300;
+    color: $sp-text;
+    margin: $spacing-xl 0;
+    padding: 0;
+
+    .breadcrumb-item {
+      color: $sp-text-light;
+
+      a {
+        color: $sp-text;
+        text-decoration: none;
+
+        &:hover {
+          background-color: $sp-bg;
+        }
+      }
+
+      &.active {
+        color: $sp-text-dark;
+        font-weight: 500;
+      }
+
+      + .breadcrumb-item::before {
+        content: '>';
+        color: $sp-text;
+        font-weight: 300;
+      }
+    }
+  }
+}

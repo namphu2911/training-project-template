@@ -38,12 +38,78 @@ body {
   }
 }
 
+.sp-dropdown {
+  border: 1px solid #e5e5e5;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 6px 0;
+  min-width: 160px;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.sp-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #333333;
+}
+.sp-dropdown-item:hover {
+  background-color: #f3f3f3;
+  color: #333333;
+}
+.sp-dropdown-item:active {
+  background-color: #cccccc;
+  color: #333333;
+}
+
+.sp-dropdown-icon {
+  font-size: 16px;
+  color: #b4009e;
+}
+
 .sp-container {
   max-width: 100%;
 }
 
 .sp-main {
   margin-left: 24px;
+}
+
+.sp-breadcrumb-bar {
+  margin: 24px 0;
+  padding: 0;
+}
+
+.sp-breadcrumb-nav .sp-breadcrumb {
+  font-size: 22px;
+  font-weight: 300;
+  color: #333333;
+  margin: 24px 0;
+  padding: 0;
+}
+.sp-breadcrumb-nav .sp-breadcrumb .breadcrumb-item {
+  color: #666666;
+}
+.sp-breadcrumb-nav .sp-breadcrumb .breadcrumb-item a {
+  color: #333333;
+  text-decoration: none;
+}
+.sp-breadcrumb-nav .sp-breadcrumb .breadcrumb-item a:hover {
+  background-color: #f3f3f3;
+}
+.sp-breadcrumb-nav .sp-breadcrumb .breadcrumb-item.active {
+  color: #000000;
+  font-weight: 500;
+}
+.sp-breadcrumb-nav .sp-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: ">";
+  color: #333333;
+  font-weight: 300;
 }
 
 .sp-toggler {
@@ -247,12 +313,22 @@ body {
 }
 
 .sp-col-add {
-  width: 15%;
+  width: 10%;
 }
 @media (max-width: 767px) {
   .sp-col-add {
     display: none;
     padding: 0 !important;
+  }
+}
+
+.sp-col-actions {
+  width: 20%;
+  padding-right: 24px;
+}
+@media (max-width: 767px) {
+  .sp-col-actions {
+    width: 100%;
   }
 }
 
@@ -279,12 +355,51 @@ body {
   }
 }
 
+.sp-folder-link {
+  color: #333333;
+  cursor: pointer;
+}
+.sp-folder-link:hover {
+  text-decoration: underline;
+}
+
+.sp-empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  color: #666666;
+  gap: 12px;
+}
+.sp-empty-message .sp-empty-icon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+.sp-loading-row td {
+  padding: 64px !important;
+}
+
+.sp-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.sp-spinner .sp-loading-text {
+  color: #666666;
+  font-size: 14px;
+}
+
 .sp-title {
   font-size: 28px;
   font-weight: 300;
   color: #333333;
   margin: 24px 0;
   padding: 0;
+  display: none;
 }
 @media (max-width: 767px) {
   .sp-title {
