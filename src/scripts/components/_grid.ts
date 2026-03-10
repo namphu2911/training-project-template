@@ -43,6 +43,9 @@ const escapeHtml = (text: string) => {
 const renderFolderRow = (folder: IFolder) => {
   return `
   <tr data-id="${folder.id}" data-type="folder">
+    <td class="sp-col-select">
+      <input type="checkbox" class="row-select">
+    </td>
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
     </td>
@@ -70,6 +73,9 @@ const renderFileRow = (file: IFileItem) => {
   const displayName = file.extension === FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
   return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
+    <td class="sp-col-select">
+      <input type="checkbox" class="row-select">
+    </td>
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="${iconInfo.icon}" class="${iconInfo.cssClass}"></iconify-icon>
     </td>

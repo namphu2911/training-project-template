@@ -231,6 +231,9 @@ body {
 .sp-table tbody tr:hover {
   background-color: #f3f3f3;
 }
+.sp-table tbody tr:hover .row-select {
+  visibility: visible;
+}
 @media (max-width: 767px) {
   .sp-table tbody tr {
     display: block;
@@ -250,7 +253,7 @@ body {
   color: #333333;
   vertical-align: middle;
 }
-.sp-table tbody td:nth-child(3), .sp-table tbody td:nth-child(4) {
+.sp-table tbody td:nth-child(4), .sp-table tbody td:nth-child(5) {
   color: #666666;
 }
 @media (max-width: 767px) {
@@ -260,8 +263,12 @@ body {
     padding: 8px;
     border-bottom: 1px solid #e5e5e5;
   }
+  .sp-table tbody td:first-child, .sp-table tbody td:nth-child(6) {
+    display: none;
+  }
   .sp-table tbody td:last-child {
     border-bottom: none;
+    display: none;
   }
   .sp-table tbody td::before {
     content: attr(data-label);
@@ -274,7 +281,7 @@ body {
 }
 
 .sp-col-icon {
-  width: 5%;
+  width: 3%;
   padding-left: 32px;
   text-align: right;
 }
@@ -391,6 +398,39 @@ body {
 .sp-spinner .sp-loading-text {
   color: #666666;
   font-size: 14px;
+}
+
+.sp-col-select {
+  width: 3%;
+  padding-left: 24px;
+  text-align: right;
+}
+@media (max-width: 767px) {
+  .sp-col-select {
+    display: none;
+  }
+}
+
+.row-select {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.sp-btn-rename,
+.sp-btn-delete,
+.row-select {
+  visibility: hidden;
+  font-size: 16px;
+}
+
+.row-selected {
+  background-color: #f3f3f3;
+}
+.row-selected .sp-btn-rename,
+.row-selected .sp-btn-delete,
+.row-selected .row-select {
+  visibility: visible;
 }
 
 .sp-title {

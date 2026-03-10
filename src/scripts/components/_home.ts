@@ -179,7 +179,8 @@ const bindTableEvents = () => {
 
     // Table row double click (open folder)
     document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
-        el.addEventListener('dblclick', () => {
+        el.addEventListener('dblclick', (e) => {
+            if ((e.target as HTMLElement).closest('.row-select')) return;
             const type = (el as HTMLElement).dataset.type;
             const id = (el as HTMLElement).dataset.id;
             if (type === 'folder' && id) {
@@ -215,6 +216,26 @@ const bindTableEvents = () => {
     });
 };
 
+// Row selection (delegated – attached once)
+const bindRowSelectEvents = () => {
+    document.addEventListener('change', (e) => {
+        const checkbox = e.target as HTMLInputElement;
+        if (!checkbox.classList.contains('row-select')) return;
+
+        document.querySelectorAll('tr').forEach((row) => {
+            row.classList.remove('row-selected');
+        });
+
+        document.querySelectorAll<HTMLInputElement>('.row-select').forEach((cb) => {
+            if (cb !== checkbox) cb.checked = false;
+        });
+
+        if (checkbox.checked) {
+            checkbox.closest('tr')?.classList.add('row-selected');
+        }
+    });
+};
+
 // Navbar dropdown buttons
 const bindNavbarEvents = () => {
     document.getElementById('btn-new-folder')?.addEventListener('click', handleNewFolder);
@@ -235,6 +256,7 @@ const bindHistoryEvents = () => {
 export const initHome = async () => {
     bindNavbarEvents();
     bindHistoryEvents();
+    bindRowSelectEvents();
 
     // Check URL hash for initial folder
     const hash = window.location.hash;

@@ -58,6 +58,9 @@ const escapeHtml = (text) => {
 const renderFolderRow = (folder) => {
     return `
   <tr data-id="${folder.id}" data-type="folder">
+    <td class="sp-col-select">
+      <input type="checkbox" class="row-select">
+    </td>
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
     </td>
@@ -84,6 +87,9 @@ const renderFileRow = (file) => {
     const displayName = file.extension === _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
     return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
+    <td class="sp-col-select">
+      <input type="checkbox" class="row-select">
+    </td>
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="${iconInfo.icon}" class="${iconInfo.cssClass}"></iconify-icon>
     </td>
@@ -331,7 +337,9 @@ const bindTableEvents = () => {
     });
     // Table row double click (open folder)
     document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
-        el.addEventListener('dblclick', () => {
+        el.addEventListener('dblclick', (e) => {
+            if (e.target.closest('.row-select'))
+                return;
             const type = el.dataset.type;
             const id = el.dataset.id;
             if (type === 'folder' && id) {
@@ -354,6 +362,24 @@ const bindTableEvents = () => {
         });
     });
 };
+// Row selection (delegated – attached once)
+const bindRowSelectEvents = () => {
+    document.addEventListener('change', (e) => {
+        const checkbox = e.target;
+        if (!checkbox.classList.contains('row-select'))
+            return;
+        document.querySelectorAll('tr').forEach((row) => {
+            row.classList.remove('row-selected');
+        });
+        document.querySelectorAll('.row-select').forEach((cb) => {
+            if (cb !== checkbox)
+                cb.checked = false;
+        });
+        if (checkbox.checked) {
+            checkbox.closest('tr')?.classList.add('row-selected');
+        }
+    });
+};
 // Navbar dropdown buttons
 const bindNavbarEvents = () => {
     document.getElementById('btn-new-folder')?.addEventListener('click', handleNewFolder);
@@ -372,6 +398,7 @@ const bindHistoryEvents = () => {
 const initHome = async () => {
     bindNavbarEvents();
     bindHistoryEvents();
+    bindRowSelectEvents();
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
@@ -469,6 +496,25 @@ const getFolderById = async (id) => {
     const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
     return (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, id);
 };
+// Unique name helpers
+const getUniqueFolderName = (parent, name) => {
+    const existing = new Set(parent.subFolders.map((f) => f.name));
+    if (!existing.has(name))
+        return name;
+    let i = 1;
+    while (existing.has(`${name} (${i})`))
+        i++;
+    return `${name} (${i})`;
+};
+const getUniqueFileName = (parent, name, extension) => {
+    const existing = new Set(parent.files.filter((f) => f.extension === extension).map((f) => f.name));
+    if (!existing.has(name))
+        return name;
+    let i = 1;
+    while (existing.has(`${name} (${i})`))
+        i++;
+    return `${name} (${i})`;
+};
 // Folder CRUD
 const createFolder = async (name, parentId, createdBy) => {
     await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
@@ -477,10 +523,11 @@ const createFolder = async (name, parentId, createdBy) => {
     const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentId);
     if (!parent)
         throw new Error(`Parent folder "${parentId}" not found`);
+    const uniqueName = getUniqueFolderName(parent, name);
     const ts = new Date().toISOString();
     const newFolder = {
         id: (0,_utilities_data__WEBPACK_IMPORTED_MODULE_1__.generateId)(),
-        name,
+        name: uniqueName,
         parentId,
         files: [],
         subFolders: [],
@@ -526,10 +573,11 @@ const createFile = async (name, extension, size, parentFolderId, createdBy) => {
     const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentFolderId);
     if (!parent)
         throw new Error(`Parent folder "${parentFolderId}" not found`);
+    const uniqueName = getUniqueFileName(parent, name, extension);
     const ts = new Date().toISOString();
     const newFile = {
         id: (0,_utilities_data__WEBPACK_IMPORTED_MODULE_1__.generateId)(),
-        name,
+        name: uniqueName,
         extension,
         size,
         parentFolderId,

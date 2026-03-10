@@ -37,6 +37,25 @@ export const getFolderById = async (id: string) => {
   return findFolderById(root, id);
 };
 
+// Unique name helpers
+const getUniqueFolderName = (parent: IFolder, name: string): string => {
+  const existing = new Set(parent.subFolders.map((f) => f.name));
+  if (!existing.has(name)) return name;
+  let i = 1;
+  while (existing.has(`${name} (${i})`)) i++;
+  return `${name} (${i})`;
+};
+
+const getUniqueFileName = (parent: IFolder, name: string, extension: FileExtension): string => {
+  const existing = new Set(
+    parent.files.filter((f) => f.extension === extension).map((f) => f.name)
+  );
+  if (!existing.has(name)) return name;
+  let i = 1;
+  while (existing.has(`${name} (${i})`)) i++;
+  return `${name} (${i})`;
+};
+
 // Folder CRUD
 export const createFolder = async (name: string, parentId: string, createdBy: string) => {
   await randomDelay();
@@ -45,10 +64,11 @@ export const createFolder = async (name: string, parentId: string, createdBy: st
   const parent = findFolderById(root, parentId);
   if (!parent) throw new Error(`Parent folder "${parentId}" not found`);
 
+  const uniqueName = getUniqueFolderName(parent, name);
   const ts = new Date().toISOString();
   const newFolder: IFolder = {
     id: generateId(),
-    name,
+    name: uniqueName,
     parentId,
     files: [],
     subFolders: [],
@@ -104,10 +124,11 @@ export const createFile = async (
   const parent = findFolderById(root, parentFolderId);
   if (!parent) throw new Error(`Parent folder "${parentFolderId}" not found`);
 
+  const uniqueName = getUniqueFileName(parent, name, extension);
   const ts = new Date().toISOString();
   const newFile: IFileItem = {
     id: generateId(),
-    name,
+    name: uniqueName,
     extension,
     size,
     parentFolderId,

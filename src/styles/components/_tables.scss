@@ -25,6 +25,10 @@
 
       &:hover {
         background-color: $sp-bg;
+
+        .row-select {
+          visibility: visible;
+        }
       }
 
       @media (max-width: $breakpoint-md) {
@@ -48,8 +52,8 @@
       color: $sp-text;
       vertical-align: middle;
 
-      &:nth-child(3),
-      &:nth-child(4) {
+      &:nth-child(4),
+      &:nth-child(5) {
         color: $sp-text-light;
       }
 
@@ -59,8 +63,14 @@
         padding: $spacing-sm;
         border-bottom: 1px solid $sp-border;
 
+        &:first-child,
+        &:nth-child(6) {
+          display: none;
+        }
+
         &:last-child {
           border-bottom: none;
+          display: none;
         }
 
         // Show label from data-label attribute
@@ -79,7 +89,7 @@
 
 // Column widths
 .sp-col-icon {
-  width: 5%;
+  width: 3%;
   padding-left: $spacing-xxl;
   text-align: right;
 
@@ -197,5 +207,38 @@
   .sp-loading-text {
     color: $sp-text-light;
     font-size: $font-size-base;
+  }
+}
+
+.sp-col-select {
+  width: 3%;
+  padding-left: $spacing-xl;
+  text-align: right;
+
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.row-select {
+  width: $icon-size-lg;
+  height: $icon-size-lg;
+  cursor: pointer;
+}
+
+.sp-btn-rename,
+.sp-btn-delete,
+.row-select {
+  visibility: hidden;
+  font-size: $font-size-lg;
+}
+
+.row-selected {
+  background-color: $sp-bg;
+
+  .sp-btn-rename,
+  .sp-btn-delete,
+  .row-select {
+    visibility: visible;
   }
 }
