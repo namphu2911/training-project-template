@@ -13,6 +13,6 @@ export const readStore = (): IFolder => {
     return JSON.parse(raw) as IFolder;
 };
 
-export const writeStore = (root: IFolder): void => {
+export const writeStore = (root: IFolder) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(root));
 };

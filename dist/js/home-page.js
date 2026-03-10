@@ -50,8 +50,13 @@ const formatDate = (iso) => {
         'July', 'August', 'September', 'October', 'November', 'December'];
     return `${months[date.getMonth()]} ${date.getDate()}`;
 };
+const escapeHtml = (text) => {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+};
 // Render helpers
-const renderFolderRow = (folder) => `
+const renderFolderRow = (folder) => {
+    return `
   <tr data-id="${folder.id}" data-type="folder">
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
@@ -73,9 +78,10 @@ const renderFolderRow = (folder) => `
       </button>
     </td>
   </tr>`;
+};
 const renderFileRow = (file) => {
     const iconInfo = fileIconMap[file.extension] || fileIconMap[_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other];
-    const displayName = `${file.name}.${file.extension}`;
+    const displayName = file.extension === _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
     return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
     <td class="sp-col-icon" data-label="File Type">
@@ -98,10 +104,6 @@ const renderFileRow = (file) => {
       </button>
     </td>
   </tr>`;
-};
-const escapeHtml = (text) => {
-    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
 // Loading spinner
 const showLoading = () => {
@@ -182,8 +184,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   initHome: function() { return /* binding */ initHome; }
 /* harmony export */ });
-/* harmony import */ var _services_storage_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/_storage.service */ "./src/scripts/services/_storage.service.ts");
-/* harmony import */ var _grid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./_grid */ "./src/scripts/components/_grid.ts");
+/* harmony import */ var _models_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models/_enums */ "./src/scripts/models/_enums.ts");
+/* harmony import */ var _services_storage_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/_storage.service */ "./src/scripts/services/_storage.service.ts");
+/* harmony import */ var _utilities_treeFolder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utilities/_treeFolder */ "./src/scripts/utilities/_treeFolder.ts");
+/* harmony import */ var _grid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./_grid */ "./src/scripts/components/_grid.ts");
+
+
 
 
 // State
@@ -192,8 +198,8 @@ let currentFolderId = 'root';
 const CURRENT_USER = 'Current User';
 // Navigation (with browser history)
 const navigateToFolder = async (folderId, pushState = true) => {
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
-    const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.getFolderById)(folderId);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(folderId);
     if (!folder)
         return;
     currentFolderId = folderId;
@@ -201,30 +207,20 @@ const navigateToFolder = async (folderId, pushState = true) => {
     if (pushState) {
         history.pushState({ folderId }, '', `#folder=${folderId}`);
     }
-    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.getBreadcrumbPath)(folderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderDocumentTable)(folder);
+    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(folderId);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder);
     bindTableEvents();
 };
 // Reload current folder
 const reloadCurrentFolder = async () => {
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
-    rootFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.loadDocuments)();
-    const findFolder = (f, id) => {
-        if (f.id === id)
-            return f;
-        for (const sub of f.subFolders) {
-            const found = findFolder(sub, id);
-            if (found)
-                return found;
-        }
-        return null;
-    };
-    const current = findFolder(rootFolder, currentFolderId) || rootFolder;
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    rootFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.loadDocuments)();
+    const current = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_2__.findFolderById)(rootFolder, currentFolderId) || rootFolder;
     currentFolderId = current.id;
-    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.getBreadcrumbPath)(currentFolderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderDocumentTable)(current);
+    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(currentFolderId);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(current);
     bindTableEvents();
 };
 // Simple prompt-based modals
@@ -239,23 +235,23 @@ const handleNewFolder = async () => {
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim())
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
-    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.createFolder)(name.trim(), currentFolderId, CURRENT_USER);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFolder)(name.trim(), currentFolderId, CURRENT_USER);
     await reloadCurrentFolder();
 };
 const handleNewFile = async () => {
     const name = promptInput('Enter file name (e.g. report.xlsx):');
     if (!name || !name.trim())
         return;
-    const dotIndex = name.lastIndexOf('.');
-    const fileName = dotIndex > 0 ? name.substring(0, dotIndex) : name;
-    const ext = dotIndex > 0 ? name.substring(dotIndex + 1).toLowerCase() : 'txt';
-    const { FileExtension } = await Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ../models/_enums */ "./src/scripts/models/_enums.ts"));
-    const extension = Object.values(FileExtension).includes(ext)
-        ? ext
-        : FileExtension.Other;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
-    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.createFile)(fileName.trim(), extension, 0, currentFolderId, CURRENT_USER);
+    const trimmed = name.trim();
+    const dotIndex = trimmed.lastIndexOf('.');
+    const rawName = dotIndex > 0 ? trimmed.substring(0, dotIndex) : trimmed;
+    const rawExt = dotIndex > 0 ? trimmed.substring(dotIndex + 1).toLowerCase() : 'txt';
+    const isKnownExt = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(rawExt);
+    const fileName = isKnownExt ? rawName : trimmed;
+    const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFile)(fileName, extension, 0, currentFolderId, CURRENT_USER);
     await reloadCurrentFolder();
 };
 const handleUploadFiles = () => {
@@ -265,8 +261,8 @@ const handleUploadFiles = () => {
     input.onchange = async () => {
         if (!input.files || input.files.length === 0)
             return;
-        (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
-        const promises = Array.from(input.files).map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.uploadFile)(file, currentFolderId, CURRENT_USER));
+        (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+        const promises = Array.from(input.files).map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.uploadFile)(file, currentFolderId, CURRENT_USER));
         await Promise.all(promises);
         await reloadCurrentFolder();
     };
@@ -282,53 +278,65 @@ const handleUploadFolder = () => {
     input.onchange = async () => {
         if (!input.files || input.files.length === 0)
             return;
-        (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
+        (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
         // Files from folder upload have webkitRelativePath like "FolderName/sub/file.txt"
         // Group by top-level folder name and create structure
         const files = Array.from(input.files);
         const topFolderName = files[0].webkitRelativePath.split('/')[0];
         // Create the top-level folder
-        const topFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.createFolder)(topFolderName, currentFolderId, CURRENT_USER);
+        const topFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFolder)(topFolderName, currentFolderId, CURRENT_USER);
         // Upload all files into that folder (flat – ignoring nested subdirs for simplicity)
-        const promises = files.map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.uploadFile)(file, topFolder.id, CURRENT_USER));
+        const promises = files.map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.uploadFile)(file, topFolder.id, CURRENT_USER));
         await Promise.all(promises);
         await reloadCurrentFolder();
     };
     input.click();
 };
+// Action handlers for rename and delete (both files and folders)
 const handleRename = async (id, type, currentName, parentId) => {
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName)
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     if (type === 'folder') {
-        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.renameFolder)(id, newName.trim(), CURRENT_USER);
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.renameFolder)(id, newName.trim(), CURRENT_USER);
     }
     else if (parentId) {
-        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.renameFile)(id, parentId, newName.trim(), CURRENT_USER);
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.renameFile)(id, parentId, newName.trim(), CURRENT_USER);
     }
     await reloadCurrentFolder();
 };
 const handleDelete = async (id, type, name, parentId) => {
     if (!confirmAction(`Are you sure you want to delete "${name}"?`))
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     if (type === 'folder') {
-        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.deleteFolder)(id);
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFolder)(id);
     }
     else if (parentId) {
-        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.deleteFile)(id, parentId);
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFile)(id, parentId);
     }
     await reloadCurrentFolder();
 };
 // Event binding – table rows
 const bindTableEvents = () => {
+    // Folder link click (open folder)
     document.querySelectorAll('.sp-folder-link').forEach((el) => {
         el.addEventListener('click', (e) => {
             e.preventDefault();
             const folderId = el.dataset.folderId;
             if (folderId)
                 navigateToFolder(folderId);
+        });
+    });
+    // Table row double click (open folder)
+    document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
+        el.addEventListener('dblclick', () => {
+            const type = el.dataset.type;
+            const id = el.dataset.id;
+            if (type === 'folder' && id) {
+                navigateToFolder(id);
+            }
         });
     });
     // Rename buttons
@@ -362,33 +370,17 @@ const bindHistoryEvents = () => {
 };
 // Initialize
 const initHome = async () => {
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.showLoading)();
     bindNavbarEvents();
     bindHistoryEvents();
-    rootFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.loadDocuments)();
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
-    const initialFolderId = match ? match[1] : rootFolder.id;
-    // Find the initial folder
-    const findFolder = (f, id) => {
-        if (f.id === id)
-            return f;
-        for (const sub of f.subFolders) {
-            const found = findFolder(sub, id);
-            if (found)
-                return found;
-        }
-        return null;
-    };
-    const initialFolder = findFolder(rootFolder, initialFolderId) || rootFolder;
-    currentFolderId = initialFolder.id;
-    // Replace current history entry (so first navigation is recorded)
+    // Set initial folder from URL hash before first load
+    if (match)
+        currentFolderId = match[1];
+    await reloadCurrentFolder();
+    // Record initial state for browser back/forward (replace, not push)
     history.replaceState({ folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
-    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_0__.getBreadcrumbPath)(currentFolderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_1__.renderDocumentTable)(initialFolder);
-    bindTableEvents();
 };
 
 
@@ -580,11 +572,11 @@ const deleteFile = async (fileId, parentFolderId) => {
 const uploadFile = async (file, parentFolderId, uploadedBy) => {
     await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)(500, 1000); // slightly longer for "upload"
     const dotIndex = file.name.lastIndexOf('.');
-    const name = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
-    const ext = dotIndex > 0 ? file.name.substring(dotIndex + 1).toLowerCase() : 'other';
-    const extension = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(ext)
-        ? ext
-        : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
+    const rawName = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
+    const rawExt = dotIndex > 0 ? file.name.substring(dotIndex + 1).toLowerCase() : '';
+    const isKnownExt = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(rawExt);
+    const name = isKnownExt ? rawName : file.name;
+    const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
     return createFile(name, extension, file.size, parentFolderId, uploadedBy);
 };
 

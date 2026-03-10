@@ -34,8 +34,14 @@ const formatDate = (iso: string) => {
   return `${months[date.getMonth()]} ${date.getDate()}`;
 };
 
+const escapeHtml = (text: string) => {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+};
+
 // Render helpers
-const renderFolderRow = (folder: IFolder) => `
+const renderFolderRow = (folder: IFolder) => {
+  return `
   <tr data-id="${folder.id}" data-type="folder">
     <td class="sp-col-icon" data-label="File Type">
       <iconify-icon icon="ooui:folder-placeholder-rtl" class="folder-icon"></iconify-icon>
@@ -57,10 +63,11 @@ const renderFolderRow = (folder: IFolder) => `
       </button>
     </td>
   </tr>`;
+}
 
 const renderFileRow = (file: IFileItem) => {
   const iconInfo = fileIconMap[file.extension] || fileIconMap[FileExtension.Other];
-  const displayName = `${file.name}.${file.extension}`;
+  const displayName = file.extension === FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
   return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
     <td class="sp-col-icon" data-label="File Type">
@@ -83,11 +90,6 @@ const renderFileRow = (file: IFileItem) => {
       </button>
     </td>
   </tr>`;
-};
-
-const escapeHtml = (text: string) => {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
 
 // Loading spinner
@@ -135,10 +137,7 @@ export const renderDocumentTable = (folder: IFolder) => {
 };
 
 // Breadcrumb
-export const renderBreadcrumb = (
-  path: IInfoParam[],
-  onNavigate: (folderId: string) => void
-) => {
+export const renderBreadcrumb = (path: IInfoParam[], onNavigate: (folderId: string) => void) => {
   const titleEl = document.getElementById('sp-title');
   const navEl = document.getElementById('sp-breadcrumb');
   if (!titleEl || !navEl) return;
@@ -161,7 +160,8 @@ export const renderBreadcrumb = (
     el.addEventListener('click', (e) => {
       e.preventDefault();
       const folderId = (el as HTMLElement).dataset.folderId;
-      if (folderId) onNavigate(folderId);
+      if (folderId)
+        onNavigate(folderId);
     });
   });
 };

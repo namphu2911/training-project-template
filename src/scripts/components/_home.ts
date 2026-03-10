@@ -1,3 +1,4 @@
+import { FileExtension } from '../models/_enums';
 import { IFolder } from '../models/_interfaces';
 import {
     loadDocuments,
@@ -11,6 +12,7 @@ import {
     uploadFile,
     getBreadcrumbPath,
 } from '../services/_storage.service';
+import { findFolderById } from '../utilities/_treeFolder';
 import { renderDocumentTable, showLoading, renderBreadcrumb } from './_grid';
 
 // State
@@ -37,20 +39,11 @@ const navigateToFolder = async (folderId: string, pushState = true) => {
     bindTableEvents();
 };
 
-
 // Reload current folder
 const reloadCurrentFolder = async () => {
     showLoading();
     rootFolder = await loadDocuments();
-    const findFolder = (f: IFolder, id: string): IFolder | null => {
-        if (f.id === id) return f;
-        for (const sub of f.subFolders) {
-            const found = findFolder(sub, id);
-            if (found) return found;
-        }
-        return null;
-    };
-    const current = findFolder(rootFolder, currentFolderId) || rootFolder;
+    const current = findFolderById(rootFolder, currentFolderId) || rootFolder;
     currentFolderId = current.id;
 
     const path = getBreadcrumbPath(currentFolderId);
@@ -68,7 +61,6 @@ const confirmAction = (message: string) => {
     return confirm(message);
 };
 
-
 // CRUD handlers
 const handleNewFolder = async () => {
     const name = promptInput('Enter folder name:');
@@ -83,17 +75,19 @@ const handleNewFile = async () => {
     const name = promptInput('Enter file name (e.g. report.xlsx):');
     if (!name || !name.trim()) return;
 
-    const dotIndex = name.lastIndexOf('.');
-    const fileName = dotIndex > 0 ? name.substring(0, dotIndex) : name;
-    const ext = dotIndex > 0 ? name.substring(dotIndex + 1).toLowerCase() : 'txt';
+    const trimmed = name.trim();
+    const dotIndex = trimmed.lastIndexOf('.');
 
-    const { FileExtension } = await import('../models/_enums');
-    const extension = Object.values(FileExtension).includes(ext as any)
-        ? (ext as any)
-        : FileExtension.Other;
+    const rawName = dotIndex > 0 ? trimmed.substring(0, dotIndex) : trimmed;
+    const rawExt = dotIndex > 0 ? trimmed.substring(dotIndex + 1).toLowerCase() : 'txt';
+
+    const isKnownExt = Object.values(FileExtension).includes(rawExt as any);
+
+    const fileName = isKnownExt ? rawName : trimmed;
+    const extension = isKnownExt ? (rawExt as any) : FileExtension.Other;
 
     showLoading();
-    await createFile(fileName.trim(), extension, 0, currentFolderId, CURRENT_USER);
+    await createFile(fileName, extension, 0, currentFolderId, CURRENT_USER);
     await reloadCurrentFolder();
 };
 
@@ -146,6 +140,7 @@ const handleUploadFolder = () => {
     input.click();
 };
 
+// Action handlers for rename and delete (both files and folders)
 const handleRename = async (id: string, type: string, currentName: string, parentId?: string) => {
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName) return;
@@ -173,11 +168,23 @@ const handleDelete = async (id: string, type: string, name: string, parentId?: s
 
 // Event binding – table rows
 const bindTableEvents = () => {
+    // Folder link click (open folder)
     document.querySelectorAll('.sp-folder-link').forEach((el) => {
         el.addEventListener('click', (e) => {
             e.preventDefault();
             const folderId = (el as HTMLElement).dataset.folderId;
             if (folderId) navigateToFolder(folderId);
+        });
+    });
+
+    // Table row double click (open folder)
+    document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
+        el.addEventListener('dblclick', () => {
+            const type = (el as HTMLElement).dataset.type;
+            const id = (el as HTMLElement).dataset.id;
+            if (type === 'folder' && id) {
+                navigateToFolder(id);
+            }
         });
     });
 
@@ -226,34 +233,18 @@ const bindHistoryEvents = () => {
 
 // Initialize
 export const initHome = async () => {
-    showLoading();
     bindNavbarEvents();
     bindHistoryEvents();
-
-    rootFolder = await loadDocuments();
 
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
-    const initialFolderId = match ? match[1] : rootFolder.id;
 
-    // Find the initial folder
-    const findFolder = (f: IFolder, id: string): IFolder | null => {
-        if (f.id === id) return f;
-        for (const sub of f.subFolders) {
-            const found = findFolder(sub, id);
-            if (found) return found;
-        }
-        return null;
-    };
-    const initialFolder = findFolder(rootFolder, initialFolderId) || rootFolder;
-    currentFolderId = initialFolder.id;
+    // Set initial folder from URL hash before first load
+    if (match)
+        currentFolderId = match[1];
+    await reloadCurrentFolder();
 
-    // Replace current history entry (so first navigation is recorded)
+    // Record initial state for browser back/forward (replace, not push)
     history.replaceState({ folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
-
-    const path = getBreadcrumbPath(currentFolderId);
-    renderBreadcrumb(path, (id) => navigateToFolder(id));
-    renderDocumentTable(initialFolder);
-    bindTableEvents();
 };

@@ -160,11 +160,13 @@ export const uploadFile = async (file: File, parentFolderId: string, uploadedBy:
   await randomDelay(500, 1000); // slightly longer for "upload"
 
   const dotIndex = file.name.lastIndexOf('.');
-  const name = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
-  const ext = dotIndex > 0 ? file.name.substring(dotIndex + 1).toLowerCase() : 'other';
-  const extension = Object.values(FileExtension).includes(ext as FileExtension)
-    ? (ext as FileExtension)
-    : FileExtension.Other;
+  const rawName = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
+  const rawExt = dotIndex > 0 ? file.name.substring(dotIndex + 1).toLowerCase() : '';
+
+  const isKnownExt = Object.values(FileExtension).includes(rawExt as FileExtension);
+
+  const name = isKnownExt ? rawName : file.name;
+  const extension = isKnownExt ? (rawExt as FileExtension) : FileExtension.Other;
 
   return createFile(name, extension, file.size, parentFolderId, uploadedBy);
 };
