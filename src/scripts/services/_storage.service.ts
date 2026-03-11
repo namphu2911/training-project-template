@@ -115,7 +115,6 @@ export const deleteFolder = async (folderId: string) => {
 export const createFile = async (
   name: string,
   extension: FileExtension,
-  size: number,
   parentFolderId: string,
   createdBy: string
 ) => {
@@ -130,7 +129,6 @@ export const createFile = async (
     id: generateId(),
     name: uniqueName,
     extension,
-    size,
     parentFolderId,
     createdAt: ts,
     createdBy,
@@ -189,5 +187,5 @@ export const uploadFile = async (file: File, parentFolderId: string, uploadedBy:
   const name = isKnownExt ? rawName : file.name;
   const extension = isKnownExt ? (rawExt as FileExtension) : FileExtension.Other;
 
-  return createFile(name, extension, file.size, parentFolderId, uploadedBy);
+  return createFile(name, extension, parentFolderId, uploadedBy);
 };

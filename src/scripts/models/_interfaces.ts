@@ -4,7 +4,6 @@ export interface IFileItem {
   id: string;
   name: string;
   extension: FileExtension;
-  size: number;
   createdAt: string;
   createdBy: string;
   modifiedAt: string;
@@ -31,7 +30,6 @@ export type DocumentItem =
 export interface ICreateFileDto {
   name: string;
   extension: FileExtension;
-  size: number;
   createdBy: string;
   parentFolderId: string | null;
 }

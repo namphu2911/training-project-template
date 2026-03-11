@@ -117,7 +117,7 @@ const showLoading = () => {
     if (tbody) {
         tbody.innerHTML = `
       <tr class="sp-loading-row">
-        <td colspan="5">
+        <td colspan="7">
           <div class="sp-spinner">
             <div class="spinner-border text-secondary" role="status">
               <span class="visually-hidden">Loading...</span>
@@ -140,7 +140,7 @@ const renderDocumentTable = (folder) => {
     if (folder.subFolders.length === 0 && folder.files.length === 0) {
         rows.push(`
       <tr class="sp-empty-row">
-        <td colspan="6">
+        <td colspan="7">
           <div class="sp-empty-message">
             <iconify-icon icon="fluent-mdl2:empty-recycle-bin" class="sp-empty-icon"></iconify-icon>
             <span>This folder is empty</span>
@@ -236,7 +236,7 @@ const promptInput = (title, defaultValue = '') => {
 const confirmAction = (message) => {
     return confirm(message);
 };
-// CRUD handlers
+// Navbar action handlers
 const handleNewFolder = async () => {
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim())
@@ -257,7 +257,7 @@ const handleNewFile = async () => {
     const fileName = isKnownExt ? rawName : trimmed;
     const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
-    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFile)(fileName, extension, 0, currentFolderId, CURRENT_USER);
+    await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFile)(fileName, extension, currentFolderId, CURRENT_USER);
     await reloadCurrentFolder();
 };
 const handleUploadFiles = () => {
@@ -298,7 +298,7 @@ const handleUploadFolder = () => {
     };
     input.click();
 };
-// Action handlers for rename and delete (both files and folders)
+// Row item action handlers (rename and delete) (both files and folders)
 const handleRename = async (id, type, currentName, parentId) => {
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName)
@@ -324,7 +324,8 @@ const handleDelete = async (id, type, name, parentId) => {
     }
     await reloadCurrentFolder();
 };
-// Event binding – table rows
+// Event binding
+// Table rows
 const bindTableEvents = () => {
     // Folder link click (open folder)
     document.querySelectorAll('.sp-folder-link').forEach((el) => {
@@ -567,7 +568,7 @@ const deleteFolder = async (folderId) => {
     (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
 };
 // File CRUD
-const createFile = async (name, extension, size, parentFolderId, createdBy) => {
+const createFile = async (name, extension, parentFolderId, createdBy) => {
     await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
     const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
     const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentFolderId);
@@ -579,7 +580,6 @@ const createFile = async (name, extension, size, parentFolderId, createdBy) => {
         id: (0,_utilities_data__WEBPACK_IMPORTED_MODULE_1__.generateId)(),
         name: uniqueName,
         extension,
-        size,
         parentFolderId,
         createdAt: ts,
         createdBy,
@@ -625,7 +625,7 @@ const uploadFile = async (file, parentFolderId, uploadedBy) => {
     const isKnownExt = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(rawExt);
     const name = isKnownExt ? rawName : file.name;
     const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
-    return createFile(name, extension, file.size, parentFolderId, uploadedBy);
+    return createFile(name, extension, parentFolderId, uploadedBy);
 };
 
 
@@ -676,7 +676,6 @@ const seedData = () => ({
             id: generateId(),
             name: 'CoasterAndBargeLoading',
             extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            size: 24576,
             parentFolderId: 'root',
             createdAt: now,
             createdBy: 'Administrator MOD',
@@ -687,7 +686,6 @@ const seedData = () => ({
             id: generateId(),
             name: 'RevenueByServices',
             extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            size: 18432,
             parentFolderId: 'root',
             createdAt: now,
             createdBy: 'Administrator MOD',
@@ -698,7 +696,6 @@ const seedData = () => ({
             id: generateId(),
             name: 'RevenueByServices2016',
             extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            size: 20480,
             parentFolderId: 'root',
             createdAt: now,
             createdBy: 'Administrator MOD',
@@ -709,7 +706,6 @@ const seedData = () => ({
             id: generateId(),
             name: 'RevenueByServices2017',
             extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            size: 22528,
             parentFolderId: 'root',
             createdAt: now,
             createdBy: 'Administrator MOD',
@@ -734,7 +730,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ready: function() { return /* binding */ ready; }
 /* harmony export */ });
 const delay = (ms) => {
-    new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 };
 const ready = (fn) => {
     if (document.readyState !== 'loading') {
@@ -745,7 +741,7 @@ const ready = (fn) => {
     }
 };
 const randomDelay = (min = 100, max = 200) => {
-    delay(min + Math.floor(Math.random() * (max - min)));
+    return delay(min + Math.floor(Math.random() * (max - min)));
 };
 
 

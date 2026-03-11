@@ -61,7 +61,7 @@ const confirmAction = (message: string) => {
     return confirm(message);
 };
 
-// CRUD handlers
+// Navbar action handlers
 const handleNewFolder = async () => {
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim()) return;
@@ -87,7 +87,7 @@ const handleNewFile = async () => {
     const extension = isKnownExt ? (rawExt as any) : FileExtension.Other;
 
     showLoading();
-    await createFile(fileName, extension, 0, currentFolderId, CURRENT_USER);
+    await createFile(fileName, extension, currentFolderId, CURRENT_USER);
     await reloadCurrentFolder();
 };
 
@@ -140,7 +140,7 @@ const handleUploadFolder = () => {
     input.click();
 };
 
-// Action handlers for rename and delete (both files and folders)
+// Row item action handlers (rename and delete) (both files and folders)
 const handleRename = async (id: string, type: string, currentName: string, parentId?: string) => {
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName) return;
@@ -166,7 +166,8 @@ const handleDelete = async (id: string, type: string, name: string, parentId?: s
     await reloadCurrentFolder();
 };
 
-// Event binding – table rows
+// Event binding
+// Table rows
 const bindTableEvents = () => {
     // Folder link click (open folder)
     document.querySelectorAll('.sp-folder-link').forEach((el) => {

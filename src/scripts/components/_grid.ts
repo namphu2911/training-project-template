@@ -104,7 +104,7 @@ export const showLoading = () => {
   if (tbody) {
     tbody.innerHTML = `
       <tr class="sp-loading-row">
-        <td colspan="5">
+        <td colspan="7">
           <div class="sp-spinner">
             <div class="spinner-border text-secondary" role="status">
               <span class="visually-hidden">Loading...</span>
@@ -130,7 +130,7 @@ export const renderDocumentTable = (folder: IFolder) => {
   if (folder.subFolders.length === 0 && folder.files.length === 0) {
     rows.push(`
       <tr class="sp-empty-row">
-        <td colspan="6">
+        <td colspan="7">
           <div class="sp-empty-message">
             <iconify-icon icon="fluent-mdl2:empty-recycle-bin" class="sp-empty-icon"></iconify-icon>
             <span>This folder is empty</span>
