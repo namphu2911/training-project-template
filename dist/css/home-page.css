@@ -29,6 +29,12 @@ body {
 
 .sp-navbar .navbar-nav {
   padding: 8px;
+  width: 100%;
+}
+@media (min-width: 767px) {
+  .sp-navbar .navbar-nav > .ms-md-auto {
+    margin-left: auto !important;
+  }
 }
 @media (max-width: 767px) {
   .sp-navbar .navbar-nav {
@@ -444,6 +450,27 @@ body {
 @media (max-width: 767px) {
   .sp-title {
     font-size: 22px;
+  }
+}
+
+.sp-auth-user {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  color: #333333;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+  margin-left: 12px;
+}
+@media (max-width: 767px) {
+  .sp-auth-user {
+    margin: 8px 24px;
+    width: calc(100% - 48px);
+    justify-content: center;
   }
 }
 

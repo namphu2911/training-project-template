@@ -13,3 +13,23 @@
     font-size: $font-size-title-mobile;
   }
 }
+
+.sp-auth-user {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 40px;
+  padding: 0 $spacing-md;
+  color: $sp-text;
+  font-size: $font-size-base;
+  font-weight: 500;
+  border: 1px solid $sp-border;
+  border-radius: 999px;
+  margin-left: $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    margin: $spacing-sm $spacing-xl;
+    width: calc(100% - #{$spacing-xl * 2});
+    justify-content: center;
+  }
+}

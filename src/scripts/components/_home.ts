@@ -12,13 +12,44 @@ import {
     uploadFile,
     getBreadcrumbPath,
 } from '../services/_storage.service';
+import { apiConfig } from '../config/auth.config';
+import { initializeAuth, login, logout, getCurrentUser } from '../services/_auth.service';
+import { apiGet } from '../services/_api.service';
 import { findFolderById } from '../utilities/_treeFolder';
 import { renderDocumentTable, showLoading, renderBreadcrumb } from './_grid';
 
 // State
 let rootFolder: IFolder | null = null;
 let currentFolderId = 'root';
-const CURRENT_USER = 'Current User';
+let currentUserLabel = 'Current User';
+
+const uiLog = (...args: unknown[]) => {
+    console.log('[UI]', ...args);
+};
+
+const setCurrentUser = () => {
+    const user = getCurrentUser();
+    currentUserLabel = user?.name || user?.username || 'Current User';
+};
+
+const setAuthUiState = () => {
+    const user = getCurrentUser();
+    const userLabel = document.getElementById('sp-auth-user');
+    const loginBtn = document.getElementById('btn-auth-login') as HTMLButtonElement | null;
+    const logoutBtn = document.getElementById('btn-auth-logout') as HTMLButtonElement | null;
+
+    if (userLabel) {
+        userLabel.textContent = user?.name || user?.username || 'Not signed in';
+    }
+
+    if (loginBtn) {
+        loginBtn.style.display = user ? 'none' : 'flex';
+    }
+
+    if (logoutBtn) {
+        logoutBtn.style.display = user ? 'flex' : 'none';
+    }
+};
 
 // Navigation (with browser history)
 const navigateToFolder = async (folderId: string, pushState = true) => {
@@ -67,7 +98,7 @@ const handleNewFolder = async () => {
     if (!name || !name.trim()) return;
 
     showLoading();
-    await createFolder(name.trim(), currentFolderId, CURRENT_USER);
+    await createFolder(name.trim(), currentFolderId, currentUserLabel);
     await reloadCurrentFolder();
 };
 
@@ -87,7 +118,7 @@ const handleNewFile = async () => {
     const extension = isKnownExt ? (rawExt as any) : FileExtension.Other;
 
     showLoading();
-    await createFile(fileName, extension, currentFolderId, CURRENT_USER);
+    await createFile(fileName, extension, currentFolderId, currentUserLabel);
     await reloadCurrentFolder();
 };
 
@@ -99,7 +130,7 @@ const handleUploadFiles = () => {
         if (!input.files || input.files.length === 0) return;
         showLoading();
         const promises = Array.from(input.files).map((file) =>
-            uploadFile(file, currentFolderId, CURRENT_USER)
+            uploadFile(file, currentFolderId, currentUserLabel)
         );
         await Promise.all(promises);
         await reloadCurrentFolder();
@@ -127,12 +158,12 @@ const handleUploadFolder = () => {
         const topFolder = await createFolder(
             topFolderName,
             currentFolderId,
-            CURRENT_USER
+            currentUserLabel
         );
 
         // Upload all files into that folder (flat – ignoring nested subdirs for simplicity)
         const promises = files.map((file) =>
-            uploadFile(file, topFolder.id, CURRENT_USER)
+            uploadFile(file, topFolder.id, currentUserLabel)
         );
         await Promise.all(promises);
         await reloadCurrentFolder();
@@ -147,11 +178,43 @@ const handleRename = async (id: string, type: string, currentName: string, paren
 
     showLoading();
     if (type === 'folder') {
-        await renameFolder(id, newName.trim(), CURRENT_USER);
+        await renameFolder(id, newName.trim(), currentUserLabel);
     } else if (parentId) {
-        await renameFile(id, parentId, newName.trim(), CURRENT_USER);
+        await renameFile(id, parentId, newName.trim(), currentUserLabel);
     }
     await reloadCurrentFolder();
+};
+
+const handleLogin = async () => {
+    uiLog('handleLogin:clicked');
+
+    try {
+        await login();
+    } catch (error) {
+        uiLog('handleLogin:error', error);
+        alert(`Login failed: ${(error as Error).message}`);
+    }
+};
+
+const handleLogout = async () => {
+    try {
+        await logout();
+    } catch (error) {
+        alert(`Logout failed: ${(error as Error).message}`);
+    }
+};
+
+const handleSync = async () => {
+    try {
+        showLoading();
+        const data = await apiGet<unknown>(apiConfig.testEndpoint);
+        console.log('Protected API response', data);
+        alert('Sync completed. Check browser console for API response payload.');
+    } catch (error) {
+        alert(`Sync failed: ${(error as Error).message}`);
+    } finally {
+        await reloadCurrentFolder();
+    }
 };
 
 const handleDelete = async (id: string, type: string, name: string, parentId?: string) => {
@@ -243,6 +306,15 @@ const bindNavbarEvents = () => {
     document.getElementById('btn-new-file')?.addEventListener('click', handleNewFile);
     document.getElementById('btn-upload-files')?.addEventListener('click', handleUploadFiles);
     document.getElementById('btn-upload-folder')?.addEventListener('click', handleUploadFolder);
+    document.getElementById('btn-sync')?.addEventListener('click', handleSync);
+
+    const loginBtn = document.getElementById('btn-auth-login');
+    if (!loginBtn) {
+        uiLog('bindNavbarEvents:btn-auth-login not found');
+    }
+    loginBtn?.addEventListener('click', handleLogin);
+
+    document.getElementById('btn-auth-logout')?.addEventListener('click', handleLogout);
 };
 
 // Browser history (back / forward)
@@ -255,6 +327,10 @@ const bindHistoryEvents = () => {
 
 // Initialize
 export const initHome = async () => {
+    await initializeAuth();
+    setCurrentUser();
+    setAuthUiState();
+
     bindNavbarEvents();
     bindHistoryEvents();
     bindRowSelectEvents();
