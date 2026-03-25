@@ -97,6 +97,9 @@ export const login = async (): Promise<void> => {
 export const logout = async () => {
     authLog('logout:start');
 
+    // Clear token cache on logout
+    clearAccessTokenCache();
+
     const account = msalInstance.getActiveAccount();
     const logoutHint = getLogoutHint(account);
 
@@ -123,7 +126,19 @@ const acquireTokenInteractive = async (): Promise<never> => {
     throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
 };
 
-export const getAccessToken = async (): Promise<string> => {
+
+// Cache for accessToken, its expiry, và fromCache
+let cachedAccessToken: string | null = null;
+let cachedExpiresOn: Date | null = null;
+let cachedFromCache: boolean = false;
+
+// Trả về object chứa accessToken và fromCache để debug
+export interface AccessTokenResult {
+    accessToken: string;
+    fromCache: boolean;
+}
+
+export const getAccessToken = async (): Promise<AccessTokenResult> => {
     setActiveAccountIfMissing();
     authLog('getAccessToken:start');
 
@@ -137,6 +152,19 @@ export const getAccessToken = async (): Promise<string> => {
     const activeAccount = msalInstance.getActiveAccount();
     if (!activeAccount) {
         throw new Error('Unable to determine signed-in account.');
+    }
+
+    // Check if cached token is valid
+    if (cachedAccessToken && cachedExpiresOn) {
+        const now = new Date();
+        // Add a buffer of 1 minute to avoid edge expiry
+        if (cachedExpiresOn.getTime() - now.getTime() > 60 * 1000) {
+            authLog('getAccessToken:using-cached-token', {
+                expiresOn: toIsoString(cachedExpiresOn),
+                fromCache: cachedFromCache,
+            });
+            return { accessToken: cachedAccessToken, fromCache: cachedFromCache };
+        }
     }
 
     try {
@@ -156,15 +184,31 @@ export const getAccessToken = async (): Promise<string> => {
             },
         });
 
-        return token.accessToken;
+        cachedAccessToken = token.accessToken;
+        cachedExpiresOn = token.expiresOn ? new Date(token.expiresOn) : null;
+        cachedFromCache = !!token.fromCache;
+
+        return { accessToken: token.accessToken, fromCache: !!token.fromCache };
     } catch (error) {
         authLog('acquireTokenSilent:failed', error);
 
         if (error instanceof InteractionRequiredAuthError) {
-            return acquireTokenInteractive();
+            // Clear cache on interactive error
+            cachedAccessToken = null;
+            cachedExpiresOn = null;
+            cachedFromCache = false;
+            await acquireTokenInteractive();
+            throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
         }
         throw error;
     }
+};
+
+// Optional: clear token cache on logout
+export const clearAccessTokenCache = () => {
+    cachedAccessToken = null;
+    cachedExpiresOn = null;
+    cachedFromCache = false;
 };
 
 export const getCurrentUser = (): AccountInfo | null => {

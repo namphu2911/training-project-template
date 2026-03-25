@@ -557,6 +557,26 @@ const apiLog = (...args) => {
         return;
     console.log('[API]', ...args);
 };
+// Helper: fetch with retry on 401 (token expired)
+const fetchWithAuthRetry = async (fetchFn, retryOnce = true) => {
+    let response = await fetchFn();
+    if (response.status === 401 && retryOnce) {
+        apiLog('fetchWithAuthRetry:401-detected, clearing token and retrying');
+        (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.clearAccessTokenCache)();
+        response = await fetchFn(); // fetchFn will use latest token
+    }
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`API request failed (${response.status}): ${err}`);
+    }
+    // Try to parse JSON, fallback to void
+    try {
+        return (await response.json());
+    }
+    catch {
+        return undefined;
+    }
+};
 const normalizeUrl = (baseUrl, path) => {
     const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -568,104 +588,78 @@ const apiGet = async (path) => {
         path,
         scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.scopes,
     });
-    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
-    apiLog('apiGet:token-ready', {
-        tokenPreview: `${accessToken.slice(0, 12)}...${accessToken.slice(-8)}`,
-        // tokenPreview: accessToken,
-        tokenLength: accessToken.length,
-    });
-    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json',
-        },
-    });
-    apiLog('apiGet:response', {
-        status: response.status,
-        ok: response.ok,
-        url: response.url,
-    });
-    if (!response.ok) {
-        const body = await response.text();
-        apiLog('apiGet:error-body', body);
-        throw new Error(`API request failed (${response.status}): ${body}`);
-    }
-    const json = await response.json();
-    apiLog('apiGet:success');
-    return json;
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+                Accept: 'application/json',
+            },
+        });
+    };
+    return fetchWithAuthRetry(fetchFn);
 };
 const apiPost = async (path, body) => {
     apiLog('apiPost:start', { path });
-    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
-    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-        },
-        body: JSON.stringify(body),
-    });
-    apiLog('apiPost:response', { status: response.status, ok: response.ok });
-    if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`API POST failed (${response.status}): ${err}`);
-    }
-    return response.json();
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+    };
+    return fetchWithAuthRetry(fetchFn);
 };
 const apiPut = async (path, body) => {
     apiLog('apiPut:start', { path });
-    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
-    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
-        method: 'PUT',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-        },
-        body: JSON.stringify(body),
-    });
-    apiLog('apiPut:response', { status: response.status, ok: response.ok });
-    if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`API PUT failed (${response.status}): ${err}`);
-    }
-    return response.json();
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+    };
+    return fetchWithAuthRetry(fetchFn);
 };
 const apiDelete = async (path) => {
     apiLog('apiDelete:start', { path });
-    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
-    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    });
-    apiLog('apiDelete:response', { status: response.status, ok: response.ok });
-    if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`API DELETE failed (${response.status}): ${err}`);
-    }
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+            },
+        });
+    };
+    await fetchWithAuthRetry(fetchFn);
 };
 // For multipart file uploads – do NOT set Content-Type manually (browser sets it with boundary)
 const apiPostForm = async (path, formData) => {
     apiLog('apiPostForm:start', { path });
-    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
-    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: 'application/json',
-        },
-        body: formData,
-    });
-    apiLog('apiPostForm:response', { status: response.status, ok: response.ok });
-    if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`API POST form failed (${response.status}): ${err}`);
-    }
-    return response.json();
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+                Accept: 'application/json',
+            },
+            body: formData,
+        });
+    };
+    return fetchWithAuthRetry(fetchFn);
 };
 
 
@@ -679,6 +673,7 @@ const apiPostForm = async (path, formData) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   clearAccessTokenCache: function() { return /* binding */ clearAccessTokenCache; },
 /* harmony export */   getAccessToken: function() { return /* binding */ getAccessToken; },
 /* harmony export */   getCurrentUser: function() { return /* binding */ getCurrentUser; },
 /* harmony export */   initializeAuth: function() { return /* binding */ initializeAuth; },
@@ -771,6 +766,8 @@ const login = async () => {
 };
 const logout = async () => {
     authLog('logout:start');
+    // Clear token cache on logout
+    clearAccessTokenCache();
     const account = msalInstance.getActiveAccount();
     const logoutHint = getLogoutHint(account);
     await msalInstance.logoutRedirect({
@@ -791,6 +788,10 @@ const acquireTokenInteractive = async () => {
     });
     throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
 };
+// Cache for accessToken, its expiry, và fromCache
+let cachedAccessToken = null;
+let cachedExpiresOn = null;
+let cachedFromCache = false;
 const getAccessToken = async () => {
     setActiveAccountIfMissing();
     authLog('getAccessToken:start');
@@ -803,6 +804,18 @@ const getAccessToken = async () => {
     const activeAccount = msalInstance.getActiveAccount();
     if (!activeAccount) {
         throw new Error('Unable to determine signed-in account.');
+    }
+    // Check if cached token is valid
+    if (cachedAccessToken && cachedExpiresOn) {
+        const now = new Date();
+        // Add a buffer of 1 minute to avoid edge expiry
+        if (cachedExpiresOn.getTime() - now.getTime() > 60 * 1000) {
+            authLog('getAccessToken:using-cached-token', {
+                expiresOn: toIsoString(cachedExpiresOn),
+                fromCache: cachedFromCache,
+            });
+            return { accessToken: cachedAccessToken, fromCache: cachedFromCache };
+        }
     }
     try {
         const token = await msalInstance.acquireTokenSilent({
@@ -819,15 +832,29 @@ const getAccessToken = async () => {
                 name: token.account?.name,
             },
         });
-        return token.accessToken;
+        cachedAccessToken = token.accessToken;
+        cachedExpiresOn = token.expiresOn ? new Date(token.expiresOn) : null;
+        cachedFromCache = !!token.fromCache;
+        return { accessToken: token.accessToken, fromCache: !!token.fromCache };
     }
     catch (error) {
         authLog('acquireTokenSilent:failed', error);
         if (error instanceof _azure_msal_browser__WEBPACK_IMPORTED_MODULE_1__.InteractionRequiredAuthError) {
-            return acquireTokenInteractive();
+            // Clear cache on interactive error
+            cachedAccessToken = null;
+            cachedExpiresOn = null;
+            cachedFromCache = false;
+            await acquireTokenInteractive();
+            throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
         }
         throw error;
     }
+};
+// Optional: clear token cache on logout
+const clearAccessTokenCache = () => {
+    cachedAccessToken = null;
+    cachedExpiresOn = null;
+    cachedFromCache = false;
 };
 const getCurrentUser = () => {
     setActiveAccountIfMissing();
