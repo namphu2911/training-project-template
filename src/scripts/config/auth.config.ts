@@ -6,7 +6,7 @@ export const authConfig = {
 };
 
 export const apiConfig = {
-    baseUrl: 'https://localhost:7041',
+    baseUrl: 'https://localhost:7061',
     scopes: ['api://b9fff41a-f5dd-4d68-b230-95e45b37ab25/access_as_user'],
     testEndpoint: '/api/documents/me',
 };

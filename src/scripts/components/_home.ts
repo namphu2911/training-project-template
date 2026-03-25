@@ -1,7 +1,5 @@
 import { FileExtension } from '../models/_enums';
-import { IFolder } from '../models/_interfaces';
 import {
-    loadDocuments,
     getFolderById,
     createFolder,
     renameFolder,
@@ -11,16 +9,13 @@ import {
     deleteFile,
     uploadFile,
     getBreadcrumbPath,
+    DOCUMENT_ROOT_ID,
 } from '../services/_storage.service';
-import { apiConfig } from '../config/auth.config';
 import { initializeAuth, login, logout, getCurrentUser } from '../services/_auth.service';
-import { apiGet } from '../services/_api.service';
-import { findFolderById } from '../utilities/_treeFolder';
 import { renderDocumentTable, showLoading, renderBreadcrumb } from './_grid';
 
 // State
-let rootFolder: IFolder | null = null;
-let currentFolderId = 'root';
+let currentFolderId = DOCUMENT_ROOT_ID;
 let currentUserLabel = 'Current User';
 
 const uiLog = (...args: unknown[]) => {
@@ -64,7 +59,7 @@ const navigateToFolder = async (folderId: string, pushState = true) => {
         history.pushState({ folderId }, '', `#folder=${folderId}`);
     }
 
-    const path = getBreadcrumbPath(folderId);
+    const path = await getBreadcrumbPath(folderId);
     renderBreadcrumb(path, (id) => navigateToFolder(id));
     renderDocumentTable(folder);
     bindTableEvents();
@@ -73,13 +68,12 @@ const navigateToFolder = async (folderId: string, pushState = true) => {
 // Reload current folder
 const reloadCurrentFolder = async () => {
     showLoading();
-    rootFolder = await loadDocuments();
-    const current = findFolderById(rootFolder, currentFolderId) || rootFolder;
-    currentFolderId = current.id;
+    const folder = await getFolderById(currentFolderId);
+    if (!folder) return;
 
-    const path = getBreadcrumbPath(currentFolderId);
+    const path = await getBreadcrumbPath(currentFolderId);
     renderBreadcrumb(path, (id) => navigateToFolder(id));
-    renderDocumentTable(current);
+    renderDocumentTable(folder);
     bindTableEvents();
 };
 
@@ -206,14 +200,9 @@ const handleLogout = async () => {
 
 const handleSync = async () => {
     try {
-        showLoading();
-        const data = await apiGet<unknown>(apiConfig.testEndpoint);
-        console.log('Protected API response', data);
-        alert('Sync completed. Check browser console for API response payload.');
+        await reloadCurrentFolder();
     } catch (error) {
         alert(`Sync failed: ${(error as Error).message}`);
-    } finally {
-        await reloadCurrentFolder();
     }
 };
 
@@ -320,7 +309,7 @@ const bindNavbarEvents = () => {
 // Browser history (back / forward)
 const bindHistoryEvents = () => {
     window.addEventListener('popstate', (event) => {
-        const folderId = event.state?.folderId || 'root';
+        const folderId = event.state?.folderId || DOCUMENT_ROOT_ID;
         navigateToFolder(folderId, false); // false = don't push again
     });
 };

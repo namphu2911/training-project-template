@@ -4,7 +4,9 @@ import { IFolder, IFileItem, IInfoParam } from '../models/_interfaces';
 // Icon mapping
 const fileIconMap: Record<FileExtension, { icon: string; cssClass: string }> = {
   [FileExtension.Xlsx]: { icon: 'uiw:file-excel', cssClass: 'excel-icon' },
+  [FileExtension.Doc]: { icon: 'vscode-icons:file-type-word', cssClass: 'word-icon' },
   [FileExtension.Docx]: { icon: 'vscode-icons:file-type-word', cssClass: 'word-icon' },
+  [FileExtension.Ppt]: { icon: 'vscode-icons:file-type-powerpoint', cssClass: 'ppt-icon' },
   [FileExtension.Pptx]: { icon: 'vscode-icons:file-type-powerpoint', cssClass: 'ppt-icon' },
   [FileExtension.Pdf]: { icon: 'vscode-icons:file-type-pdf2', cssClass: 'pdf-icon' },
   [FileExtension.Txt]: { icon: 'fluent-mdl2:text-document', cssClass: 'txt-icon' },
@@ -15,7 +17,11 @@ const fileIconMap: Record<FileExtension, { icon: string; cssClass: string }> = {
 
 // Date formatting
 const formatDate = (iso: string) => {
-  const date = new Date(iso);
+  if (!iso) return '';
+  const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+  const date = new Date(normalized); // 
+  if (isNaN(date.getTime())) return '';
+
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);
@@ -35,6 +41,7 @@ const formatDate = (iso: string) => {
 };
 
 const escapeHtml = (text: string) => {
+  if (!text) return '';
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
@@ -69,8 +76,10 @@ const renderFolderRow = (folder: IFolder) => {
 }
 
 const renderFileRow = (file: IFileItem) => {
-  const iconInfo = fileIconMap[file.extension] || fileIconMap[FileExtension.Other];
-  const displayName = file.extension === FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
+  const ext = file.extension.replace(/^\./, '').toLowerCase();
+  const iconInfo = fileIconMap[ext as FileExtension] ?? fileIconMap[FileExtension.Other];
+  const displayName = ext === FileExtension.Other ? file.name : `${file.name}.${ext}`;
+
   return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
     <td class="sp-col-select">

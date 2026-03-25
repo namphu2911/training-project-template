@@ -19,7 +19,9 @@ __webpack_require__.r(__webpack_exports__);
 // Icon mapping
 const fileIconMap = {
     [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx]: { icon: 'uiw:file-excel', cssClass: 'excel-icon' },
+    [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Doc]: { icon: 'vscode-icons:file-type-word', cssClass: 'word-icon' },
     [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Docx]: { icon: 'vscode-icons:file-type-word', cssClass: 'word-icon' },
+    [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Ppt]: { icon: 'vscode-icons:file-type-powerpoint', cssClass: 'ppt-icon' },
     [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Pptx]: { icon: 'vscode-icons:file-type-powerpoint', cssClass: 'ppt-icon' },
     [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Pdf]: { icon: 'vscode-icons:file-type-pdf2', cssClass: 'pdf-icon' },
     [_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Txt]: { icon: 'fluent-mdl2:text-document', cssClass: 'txt-icon' },
@@ -29,7 +31,12 @@ const fileIconMap = {
 };
 // Date formatting
 const formatDate = (iso) => {
-    const date = new Date(iso);
+    if (!iso)
+        return '';
+    const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+    const date = new Date(normalized); // 
+    if (isNaN(date.getTime()))
+        return '';
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffSec = Math.floor(diffMs / 1000);
@@ -51,6 +58,8 @@ const formatDate = (iso) => {
     return `${months[date.getMonth()]} ${date.getDate()}`;
 };
 const escapeHtml = (text) => {
+    if (!text)
+        return '';
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
@@ -83,8 +92,9 @@ const renderFolderRow = (folder) => {
   </tr>`;
 };
 const renderFileRow = (file) => {
-    const iconInfo = fileIconMap[file.extension] || fileIconMap[_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other];
-    const displayName = file.extension === _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other ? file.name : `${file.name}.${file.extension}`;
+    const ext = file.extension.replace(/^\./, '').toLowerCase();
+    const iconInfo = fileIconMap[ext] ?? fileIconMap[_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other];
+    const displayName = ext === _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other ? file.name : `${file.name}.${ext}`;
     return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
     <td class="sp-col-select">
@@ -192,31 +202,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _models_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models/_enums */ "./src/scripts/models/_enums.ts");
 /* harmony import */ var _services_storage_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/_storage.service */ "./src/scripts/services/_storage.service.ts");
-/* harmony import */ var _config_auth_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config/auth.config */ "./src/scripts/config/auth.config.ts");
-/* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/_auth.service */ "./src/scripts/services/_auth.service.ts");
-/* harmony import */ var _services_api_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/_api.service */ "./src/scripts/services/_api.service.ts");
-/* harmony import */ var _utilities_treeFolder__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utilities/_treeFolder */ "./src/scripts/utilities/_treeFolder.ts");
-/* harmony import */ var _grid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./_grid */ "./src/scripts/components/_grid.ts");
-
-
-
+/* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/_auth.service */ "./src/scripts/services/_auth.service.ts");
+/* harmony import */ var _grid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./_grid */ "./src/scripts/components/_grid.ts");
 
 
 
 
 // State
-let rootFolder = null;
-let currentFolderId = 'root';
+let currentFolderId = _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID;
 let currentUserLabel = 'Current User';
 const uiLog = (...args) => {
     console.log('[UI]', ...args);
 };
 const setCurrentUser = () => {
-    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.getCurrentUser)();
+    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.getCurrentUser)();
     currentUserLabel = user?.name || user?.username || 'Current User';
 };
 const setAuthUiState = () => {
-    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.getCurrentUser)();
+    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.getCurrentUser)();
     const userLabel = document.getElementById('sp-auth-user');
     const loginBtn = document.getElementById('btn-auth-login');
     const logoutBtn = document.getElementById('btn-auth-logout');
@@ -232,7 +235,7 @@ const setAuthUiState = () => {
 };
 // Navigation (with browser history)
 const navigateToFolder = async (folderId, pushState = true) => {
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(folderId);
     if (!folder)
         return;
@@ -241,20 +244,20 @@ const navigateToFolder = async (folderId, pushState = true) => {
     if (pushState) {
         history.pushState({ folderId }, '', `#folder=${folderId}`);
     }
-    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(folderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.renderDocumentTable)(folder);
+    const path = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(folderId);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder);
     bindTableEvents();
 };
 // Reload current folder
 const reloadCurrentFolder = async () => {
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
-    rootFolder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.loadDocuments)();
-    const current = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_5__.findFolderById)(rootFolder, currentFolderId) || rootFolder;
-    currentFolderId = current.id;
-    const path = (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(currentFolderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.renderDocumentTable)(current);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(currentFolderId);
+    if (!folder)
+        return;
+    const path = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(currentFolderId);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder);
     bindTableEvents();
 };
 // Simple prompt-based modals
@@ -269,7 +272,7 @@ const handleNewFolder = async () => {
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim())
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFolder)(name.trim(), currentFolderId, currentUserLabel);
     await reloadCurrentFolder();
 };
@@ -284,7 +287,7 @@ const handleNewFile = async () => {
     const isKnownExt = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(rawExt);
     const fileName = isKnownExt ? rawName : trimmed;
     const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFile)(fileName, extension, currentFolderId, currentUserLabel);
     await reloadCurrentFolder();
 };
@@ -295,7 +298,7 @@ const handleUploadFiles = () => {
     input.onchange = async () => {
         if (!input.files || input.files.length === 0)
             return;
-        (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+        (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
         const promises = Array.from(input.files).map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.uploadFile)(file, currentFolderId, currentUserLabel));
         await Promise.all(promises);
         await reloadCurrentFolder();
@@ -312,7 +315,7 @@ const handleUploadFolder = () => {
     input.onchange = async () => {
         if (!input.files || input.files.length === 0)
             return;
-        (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+        (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
         // Files from folder upload have webkitRelativePath like "FolderName/sub/file.txt"
         // Group by top-level folder name and create structure
         const files = Array.from(input.files);
@@ -331,7 +334,7 @@ const handleRename = async (id, type, currentName, parentId) => {
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName)
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     if (type === 'folder') {
         await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.renameFolder)(id, newName.trim(), currentUserLabel);
     }
@@ -343,7 +346,7 @@ const handleRename = async (id, type, currentName, parentId) => {
 const handleLogin = async () => {
     uiLog('handleLogin:clicked');
     try {
-        await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.login)();
+        await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.login)();
     }
     catch (error) {
         uiLog('handleLogin:error', error);
@@ -352,7 +355,7 @@ const handleLogin = async () => {
 };
 const handleLogout = async () => {
     try {
-        await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.logout)();
+        await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.logout)();
     }
     catch (error) {
         alert(`Logout failed: ${error.message}`);
@@ -360,22 +363,16 @@ const handleLogout = async () => {
 };
 const handleSync = async () => {
     try {
-        (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
-        const data = await (0,_services_api_service__WEBPACK_IMPORTED_MODULE_4__.apiGet)(_config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.testEndpoint);
-        console.log('Protected API response', data);
-        alert('Sync completed. Check browser console for API response payload.');
+        await reloadCurrentFolder();
     }
     catch (error) {
         alert(`Sync failed: ${error.message}`);
-    }
-    finally {
-        await reloadCurrentFolder();
     }
 };
 const handleDelete = async (id, type, name, parentId) => {
     if (!confirmAction(`Are you sure you want to delete "${name}"?`))
         return;
-    (0,_grid__WEBPACK_IMPORTED_MODULE_6__.showLoading)();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     if (type === 'folder') {
         await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFolder)(id);
     }
@@ -458,13 +455,13 @@ const bindNavbarEvents = () => {
 // Browser history (back / forward)
 const bindHistoryEvents = () => {
     window.addEventListener('popstate', (event) => {
-        const folderId = event.state?.folderId || 'root';
+        const folderId = event.state?.folderId || _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID;
         navigateToFolder(folderId, false); // false = don't push again
     });
 };
 // Initialize
 const initHome = async () => {
-    await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.initializeAuth)();
+    await (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.initializeAuth)();
     setCurrentUser();
     setAuthUiState();
     bindNavbarEvents();
@@ -502,7 +499,7 @@ const authConfig = {
     enableDebugLogging: true,
 };
 const apiConfig = {
-    baseUrl: 'https://localhost:7041',
+    baseUrl: 'https://localhost:7061',
     scopes: ['api://b9fff41a-f5dd-4d68-b230-95e45b37ab25/access_as_user'],
     testEndpoint: '/api/documents/me',
 };
@@ -523,7 +520,9 @@ __webpack_require__.r(__webpack_exports__);
 var FileExtension;
 (function (FileExtension) {
     FileExtension["Xlsx"] = "xlsx";
+    FileExtension["Doc"] = "doc";
     FileExtension["Docx"] = "docx";
+    FileExtension["Ppt"] = "ppt";
     FileExtension["Pptx"] = "pptx";
     FileExtension["Pdf"] = "pdf";
     FileExtension["Txt"] = "txt";
@@ -543,7 +542,11 @@ var FileExtension;
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   apiGet: function() { return /* binding */ apiGet; }
+/* harmony export */   apiDelete: function() { return /* binding */ apiDelete; },
+/* harmony export */   apiGet: function() { return /* binding */ apiGet; },
+/* harmony export */   apiPost: function() { return /* binding */ apiPost; },
+/* harmony export */   apiPostForm: function() { return /* binding */ apiPostForm; },
+/* harmony export */   apiPut: function() { return /* binding */ apiPut; }
 /* harmony export */ });
 /* harmony import */ var _config_auth_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config/auth.config */ "./src/scripts/config/auth.config.ts");
 /* harmony import */ var _auth_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./_auth.service */ "./src/scripts/services/_auth.service.ts");
@@ -568,6 +571,7 @@ const apiGet = async (path) => {
     const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
     apiLog('apiGet:token-ready', {
         tokenPreview: `${accessToken.slice(0, 12)}...${accessToken.slice(-8)}`,
+        // tokenPreview: accessToken,
         tokenLength: accessToken.length,
     });
     const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
@@ -590,6 +594,78 @@ const apiGet = async (path) => {
     const json = await response.json();
     apiLog('apiGet:success');
     return json;
+};
+const apiPost = async (path, body) => {
+    apiLog('apiPost:start', { path });
+    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    apiLog('apiPost:response', { status: response.status, ok: response.ok });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`API POST failed (${response.status}): ${err}`);
+    }
+    return response.json();
+};
+const apiPut = async (path, body) => {
+    apiLog('apiPut:start', { path });
+    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    apiLog('apiPut:response', { status: response.status, ok: response.ok });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`API PUT failed (${response.status}): ${err}`);
+    }
+    return response.json();
+};
+const apiDelete = async (path) => {
+    apiLog('apiDelete:start', { path });
+    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+    apiLog('apiDelete:response', { status: response.status, ok: response.ok });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`API DELETE failed (${response.status}): ${err}`);
+    }
+};
+// For multipart file uploads – do NOT set Content-Type manually (browser sets it with boundary)
+const apiPostForm = async (path, formData) => {
+    apiLog('apiPostForm:start', { path });
+    const accessToken = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+    const response = await fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/json',
+        },
+        body: formData,
+    });
+    apiLog('apiPostForm:response', { status: response.status, ok: response.ok });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`API POST form failed (${response.status}): ${err}`);
+    }
+    return response.json();
 };
 
 
@@ -774,6 +850,7 @@ const getCurrentUser = () => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DOCUMENT_ROOT_ID: function() { return /* binding */ DOCUMENT_ROOT_ID; },
 /* harmony export */   createFile: function() { return /* binding */ createFile; },
 /* harmony export */   createFolder: function() { return /* binding */ createFolder; },
 /* harmony export */   deleteFile: function() { return /* binding */ deleteFile; },
@@ -785,262 +862,69 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   renameFolder: function() { return /* binding */ renameFolder; },
 /* harmony export */   uploadFile: function() { return /* binding */ uploadFile; }
 /* harmony export */ });
-/* harmony import */ var _models_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models/_enums */ "./src/scripts/models/_enums.ts");
-/* harmony import */ var _utilities_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utilities/_data */ "./src/scripts/utilities/_data.ts");
-/* harmony import */ var _utilities_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utilities/_helper */ "./src/scripts/utilities/_helper.ts");
-/* harmony import */ var _utilities_storage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utilities/_storage */ "./src/scripts/utilities/_storage.ts");
-/* harmony import */ var _utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utilities/_treeFolder */ "./src/scripts/utilities/_treeFolder.ts");
+/* harmony import */ var _api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./_api.service */ "./src/scripts/services/_api.service.ts");
 
-
-
-
-
-// Build breadcrumb path from root to target folder
-const getBreadcrumbPath = (targetId) => {
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const path = [];
-    const findPath = (folder, id) => {
-        path.push({ id: folder.id, name: folder.name });
-        if (folder.id === id)
-            return true;
-        for (const sub of folder.subFolders) {
-            if (findPath(sub, id))
-                return true;
-        }
-        path.pop();
-        return false;
-    };
-    findPath(root, targetId);
-    return path;
+const FOLDERS_BASE = '/api/folders';
+const FILES_BASE = '/api/files';
+const DOCUMENT_ROOT_ID = '00000000-0000-0000-0000-000000000000';
+// Build breadcrumb path by calling API: GET /api/folders/{id}/breadcrumb
+// Returns [{ id, name }, ...] from root to current folder
+const getBreadcrumbPath = async (folderId) => {
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)(`${FOLDERS_BASE}/${folderId}/breadcrumb`);
 };
-// Load root folder from localStorage with simulated delay
+// Load root folder: GET /api/documents/me
+// Returns IFolder (with direct files[] and subFolders[])
 const loadDocuments = async () => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)(500, 1000);
-    return (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)('/api/documents/me');
 };
-// Get a specific folder by ID
+// Get specific folder by ID: GET /api/folders/{id}
+// For root folder, calls GET /api/documents/me instead
 const getFolderById = async (id) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    return (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, id);
+    const path = id === DOCUMENT_ROOT_ID ? '/api/documents/me' : `${FOLDERS_BASE}/${id}`;
+    return await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)(path);
 };
-// Unique name helpers
-const getUniqueFolderName = (parent, name) => {
-    const existing = new Set(parent.subFolders.map((f) => f.name));
-    if (!existing.has(name))
-        return name;
-    let i = 1;
-    while (existing.has(`${name} (${i})`))
-        i++;
-    return `${name} (${i})`;
-};
-const getUniqueFileName = (parent, name, extension) => {
-    const existing = new Set(parent.files.filter((f) => f.extension === extension).map((f) => f.name));
-    if (!existing.has(name))
-        return name;
-    let i = 1;
-    while (existing.has(`${name} (${i})`))
-        i++;
-    return `${name} (${i})`;
-};
-// Folder CRUD
+// Create folder: POST /api/folders
+// Body: ICreateFolderDto { name, parentId, createdBy }
 const createFolder = async (name, parentId, createdBy) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    console.log('Creating folder:', { name, parentId, createdBy });
-    const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentId);
-    if (!parent)
-        throw new Error(`Parent folder "${parentId}" not found`);
-    const uniqueName = getUniqueFolderName(parent, name);
-    const ts = new Date().toISOString();
-    const newFolder = {
-        id: (0,_utilities_data__WEBPACK_IMPORTED_MODULE_1__.generateId)(),
-        name: uniqueName,
-        parentId,
-        files: [],
-        subFolders: [],
-        createdAt: ts,
-        createdBy,
-        modifiedAt: ts,
-        modifiedBy: createdBy,
-    };
-    parent.subFolders.push(newFolder);
-    parent.modifiedAt = ts;
-    parent.modifiedBy = createdBy;
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
-    return newFolder;
+    const dto = { name, parentId, createdBy };
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPost)(FOLDERS_BASE, dto);
 };
+// Rename folder: PUT /api/folders/{id}
+// Body: IUpdateFolderDto { name, modifiedBy }
 const renameFolder = async (folderId, newName, modifiedBy) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const folder = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, folderId);
-    if (!folder)
-        throw new Error(`Foldser "${folderId}" not found`);
-    folder.name = newName;
-    folder.modifiedAt = new Date().toISOString();
-    folder.modifiedBy = modifiedBy;
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
-    return folder;
+    const dto = { id: folderId, name: newName, modifiedBy };
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPut)(FOLDERS_BASE, dto);
 };
+// Delete folder: DELETE /api/folders/{id}
 const deleteFolder = async (folderId) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    if (folderId === 'root')
-        throw new Error('Cannot delete root folder');
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findParentOfFolder)(root, folderId);
-    if (!parent)
-        throw new Error(`Folder "${folderId}" not found`);
-    parent.subFolders = parent.subFolders.filter((f) => f.id !== folderId);
-    parent.modifiedAt = new Date().toISOString();
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FOLDERS_BASE}/${folderId}`);
 };
-// File CRUD
+// Create file entry: POST /api/files
+// Body: ICreateFileDto { name, extension, parentFolderId, createdBy }
 const createFile = async (name, extension, parentFolderId, createdBy) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentFolderId);
-    if (!parent)
-        throw new Error(`Parent folder "${parentFolderId}" not found`);
-    const uniqueName = getUniqueFileName(parent, name, extension);
-    const ts = new Date().toISOString();
-    const newFile = {
-        id: (0,_utilities_data__WEBPACK_IMPORTED_MODULE_1__.generateId)(),
-        name: uniqueName,
-        extension,
-        parentFolderId,
-        createdAt: ts,
-        createdBy,
-        modifiedAt: ts,
-        modifiedBy: createdBy,
-    };
-    parent.files.push(newFile);
-    parent.modifiedAt = ts;
-    parent.modifiedBy = createdBy;
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
-    return newFile;
+    const dto = { name, extension, parentFolderId, createdBy };
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPost)(FILES_BASE, dto);
 };
-const renameFile = async (fileId, parentFolderId, newName, modifiedBy) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentFolderId);
-    if (!parent)
-        throw new Error(`Parent folder "${parentFolderId}" not found`);
-    const file = parent.files.find((f) => f.id === fileId);
-    if (!file)
-        throw new Error(`File "${fileId}" not found`);
-    file.name = newName;
-    file.modifiedAt = new Date().toISOString();
-    file.modifiedBy = modifiedBy;
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
-    return file;
+// Rename file: PUT /api/files/{id}
+// Body: IUpdateFileDto { name, modifiedBy }
+// parentFolderId kept in signature for backward compatibility but not sent (file ID is sufficient)
+const renameFile = async (fileId, _parentFolderId, newName, modifiedBy) => {
+    const dto = { id: fileId, name: newName, modifiedBy };
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPut)(FILES_BASE, dto);
 };
-const deleteFile = async (fileId, parentFolderId) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)();
-    const root = (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.readStore)();
-    const parent = (0,_utilities_treeFolder__WEBPACK_IMPORTED_MODULE_4__.findFolderById)(root, parentFolderId);
-    if (!parent)
-        throw new Error(`Parent folder "${parentFolderId}" not found`);
-    parent.files = parent.files.filter((f) => f.id !== fileId);
-    parent.modifiedAt = new Date().toISOString();
-    (0,_utilities_storage__WEBPACK_IMPORTED_MODULE_3__.writeStore)(root);
+// Delete file: DELETE /api/files/{id}
+const deleteFile = async (fileId, _parentFolderId) => {
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FILES_BASE}/${fileId}`);
 };
+// Upload file: POST /api/files/upload (multipart/form-data)
+// FormData fields: file (binary), parentFolderId (string), uploadedBy (string)
 const uploadFile = async (file, parentFolderId, uploadedBy) => {
-    await (0,_utilities_helper__WEBPACK_IMPORTED_MODULE_2__.randomDelay)(500, 1000); // slightly longer for "upload"
-    const dotIndex = file.name.lastIndexOf('.');
-    const rawName = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
-    const rawExt = dotIndex > 0 ? file.name.substring(dotIndex + 1).toLowerCase() : '';
-    const isKnownExt = Object.values(_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension).includes(rawExt);
-    const name = isKnownExt ? rawName : file.name;
-    const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
-    return createFile(name, extension, parentFolderId, uploadedBy);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('parentFolderId', parentFolderId);
+    formData.append('uploadedBy', uploadedBy);
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPostForm)(`${FILES_BASE}/upload`, formData);
 };
-
-
-/***/ }),
-
-/***/ "./src/scripts/utilities/_data.ts":
-/*!****************************************!*\
-  !*** ./src/scripts/utilities/_data.ts ***!
-  \****************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   generateId: function() { return /* binding */ generateId; },
-/* harmony export */   seedData: function() { return /* binding */ seedData; }
-/* harmony export */ });
-/* harmony import */ var _models_enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models/_enums */ "./src/scripts/models/_enums.ts");
-
-// Seed data (matches existing HTML content)
-const now = new Date().toISOString();
-// ID generator
-const generateId = () => {
-    return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-};
-const seedData = () => ({
-    id: 'root',
-    name: 'Documents',
-    parentId: null,
-    createdAt: now,
-    createdBy: 'System',
-    modifiedAt: now,
-    modifiedBy: 'System',
-    subFolders: [
-        {
-            id: generateId(),
-            name: 'CAS',
-            parentId: 'root',
-            files: [],
-            subFolders: [],
-            createdAt: '2025-04-30T00:00:00.000Z',
-            createdBy: 'Megan Bowen',
-            modifiedAt: '2025-04-30T00:00:00.000Z',
-            modifiedBy: 'Megan Bowen',
-        },
-    ],
-    files: [
-        {
-            id: generateId(),
-            name: 'CoasterAndBargeLoading',
-            extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            parentFolderId: 'root',
-            createdAt: now,
-            createdBy: 'Administrator MOD',
-            modifiedAt: now,
-            modifiedBy: 'Administrator MOD',
-        },
-        {
-            id: generateId(),
-            name: 'RevenueByServices',
-            extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            parentFolderId: 'root',
-            createdAt: now,
-            createdBy: 'Administrator MOD',
-            modifiedAt: now,
-            modifiedBy: 'Administrator MOD',
-        },
-        {
-            id: generateId(),
-            name: 'RevenueByServices2016',
-            extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            parentFolderId: 'root',
-            createdAt: now,
-            createdBy: 'Administrator MOD',
-            modifiedAt: now,
-            modifiedBy: 'Administrator MOD',
-        },
-        {
-            id: generateId(),
-            name: 'RevenueByServices2017',
-            extension: _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Xlsx,
-            parentFolderId: 'root',
-            createdAt: now,
-            createdBy: 'Administrator MOD',
-            modifiedAt: now,
-            modifiedBy: 'Administrator MOD',
-        },
-    ],
-});
 
 
 /***/ }),
@@ -1069,72 +953,6 @@ const ready = (fn) => {
 };
 const randomDelay = (min = 100, max = 200) => {
     return delay(min + Math.floor(Math.random() * (max - min)));
-};
-
-
-/***/ }),
-
-/***/ "./src/scripts/utilities/_storage.ts":
-/*!*******************************************!*\
-  !*** ./src/scripts/utilities/_storage.ts ***!
-  \*******************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   readStore: function() { return /* binding */ readStore; },
-/* harmony export */   writeStore: function() { return /* binding */ writeStore; }
-/* harmony export */ });
-/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./_data */ "./src/scripts/utilities/_data.ts");
-
-const STORAGE_KEY = 'sp_document_store';
-const readStore = () => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-        const initial = (0,_data__WEBPACK_IMPORTED_MODULE_0__.seedData)();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-        return initial;
-    }
-    return JSON.parse(raw);
-};
-const writeStore = (root) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(root));
-};
-
-
-/***/ }),
-
-/***/ "./src/scripts/utilities/_treeFolder.ts":
-/*!**********************************************!*\
-  !*** ./src/scripts/utilities/_treeFolder.ts ***!
-  \**********************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   findFolderById: function() { return /* binding */ findFolderById; },
-/* harmony export */   findParentOfFolder: function() { return /* binding */ findParentOfFolder; }
-/* harmony export */ });
-// Folder tree helpers
-const findFolderById = (folder, id) => {
-    if (folder.id === id)
-        return folder;
-    for (const sub of folder.subFolders) {
-        const found = findFolderById(sub, id);
-        if (found)
-            return found;
-    }
-    return null;
-};
-const findParentOfFolder = (root, targetId) => {
-    for (const sub of root.subFolders) {
-        if (sub.id === targetId)
-            return root;
-        const found = findParentOfFolder(sub, targetId);
-        if (found)
-            return found;
-    }
-    return null;
 };
 
 

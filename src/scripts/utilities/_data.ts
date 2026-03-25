@@ -3,6 +3,7 @@ import { IFolder } from '../models/_interfaces';
 
 // Seed data (matches existing HTML content)
 const now = new Date().toISOString();
+const ROOT_FOLDER_ID = '00000000-0000-0000-0000-000000000000';
 
 // ID generator
 export const generateId = () => {
@@ -10,7 +11,7 @@ export const generateId = () => {
 }
 
 export const seedData = (): IFolder => ({
-    id: 'root',
+    id: ROOT_FOLDER_ID,
     name: 'Documents',
     parentId: null,
     createdAt: now,
@@ -21,7 +22,7 @@ export const seedData = (): IFolder => ({
         {
             id: generateId(),
             name: 'CAS',
-            parentId: 'root',
+            parentId: ROOT_FOLDER_ID,
             files: [],
             subFolders: [],
             createdAt: '2025-04-30T00:00:00.000Z',
@@ -35,7 +36,7 @@ export const seedData = (): IFolder => ({
             id: generateId(),
             name: 'CoasterAndBargeLoading',
             extension: FileExtension.Xlsx,
-            parentFolderId: 'root',
+            parentFolderId: ROOT_FOLDER_ID,
             createdAt: now,
             createdBy: 'Administrator MOD',
             modifiedAt: now,
@@ -45,7 +46,7 @@ export const seedData = (): IFolder => ({
             id: generateId(),
             name: 'RevenueByServices',
             extension: FileExtension.Xlsx,
-            parentFolderId: 'root',
+            parentFolderId: ROOT_FOLDER_ID,
             createdAt: now,
             createdBy: 'Administrator MOD',
             modifiedAt: now,
@@ -55,7 +56,7 @@ export const seedData = (): IFolder => ({
             id: generateId(),
             name: 'RevenueByServices2016',
             extension: FileExtension.Xlsx,
-            parentFolderId: 'root',
+            parentFolderId: ROOT_FOLDER_ID,
             createdAt: now,
             createdBy: 'Administrator MOD',
             modifiedAt: now,
@@ -65,7 +66,7 @@ export const seedData = (): IFolder => ({
             id: generateId(),
             name: 'RevenueByServices2017',
             extension: FileExtension.Xlsx,
-            parentFolderId: 'root',
+            parentFolderId: ROOT_FOLDER_ID,
             createdAt: now,
             createdBy: 'Administrator MOD',
             modifiedAt: now,

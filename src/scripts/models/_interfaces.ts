@@ -8,7 +8,7 @@ export interface IFileItem {
   createdBy: string;
   modifiedAt: string;
   modifiedBy: string;
-  parentFolderId: string | null; // null = root
+  parentFolderId: string | null; // root folder uses Guid.Empty id
 }
 
 export interface IFolder {
@@ -20,7 +20,7 @@ export interface IFolder {
   createdBy: string;
   modifiedAt: string;
   modifiedBy: string;
-  parentId: string | null; // null = root
+  parentId: string | null; // root folder id is Guid.Empty; parentId can still be null at top level
 }
 
 export type DocumentItem =
@@ -35,6 +35,7 @@ export interface ICreateFileDto {
 }
 
 export interface IUpdateFileDto {
+  id: string;
   name?: string;
   modifiedBy: string;
 }
@@ -46,6 +47,7 @@ export interface ICreateFolderDto {
 }
 
 export interface IUpdateFolderDto {
+  id: string;
   name?: string;
   modifiedBy: string;
 }
