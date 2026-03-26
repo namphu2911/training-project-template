@@ -65,6 +65,9 @@ const renderFolderRow = (folder: IFolder) => {
     <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(folder.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
       <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
         <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
       </button>
@@ -97,6 +100,9 @@ const renderFileRow = (file: IFileItem) => {
     <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(file.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
       <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
         <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
       </button>

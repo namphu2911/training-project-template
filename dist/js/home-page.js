@@ -82,6 +82,9 @@ const renderFolderRow = (folder) => {
     <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(folder.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
       <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
         <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
       </button>
@@ -112,6 +115,9 @@ const renderFileRow = (file) => {
     <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(file.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
       <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
         <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
       </button>
@@ -233,9 +239,32 @@ const setAuthUiState = () => {
         logoutBtn.style.display = user ? 'flex' : 'none';
     }
 };
+const renderSignedOutState = () => {
+    const titleEl = document.getElementById('sp-title');
+    const navEl = document.getElementById('sp-breadcrumb');
+    const tbody = document.querySelector('.sp-table tbody');
+    if (titleEl) {
+        titleEl.textContent = 'Documents';
+    }
+    if (navEl) {
+        navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Documents</li></ol>';
+    }
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr class="sp-empty-row">
+                <td colspan="7">
+                    <div class="sp-empty-message">
+                        <iconify-icon icon="fluent-mdl2:permissions" class="sp-empty-icon"></iconify-icon>
+                        <span>Please sign in to load documents</span>
+                    </div>
+                </td>
+            </tr>`;
+    }
+};
 // Navigation (with browser history)
 const navigateToFolder = async (folderId, pushState = true) => {
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    console.log('navigateToFolder');
     const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(folderId);
     if (!folder)
         return;
@@ -252,6 +281,7 @@ const navigateToFolder = async (folderId, pushState = true) => {
 // Reload current folder
 const reloadCurrentFolder = async () => {
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    console.log('reloadCurrentFolder');
     const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(currentFolderId);
     if (!folder)
         return;
@@ -267,8 +297,28 @@ const promptInput = (title, defaultValue = '') => {
 const confirmAction = (message) => {
     return confirm(message);
 };
+const triggerDownload = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+};
+const checkLoggedIn = () => {
+    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.getCurrentUser)();
+    if (!user) {
+        alert('You must be signed in to use this feature.');
+        return false;
+    }
+    return true;
+};
 // Navbar action handlers
 const handleNewFolder = async () => {
+    if (!checkLoggedIn())
+        return;
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim())
         return;
@@ -277,6 +327,8 @@ const handleNewFolder = async () => {
     await reloadCurrentFolder();
 };
 const handleNewFile = async () => {
+    if (!checkLoggedIn())
+        return;
     const name = promptInput('Enter file name (e.g. report.xlsx):');
     if (!name || !name.trim())
         return;
@@ -292,6 +344,8 @@ const handleNewFile = async () => {
     await reloadCurrentFolder();
 };
 const handleUploadFiles = () => {
+    if (!checkLoggedIn())
+        return;
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -306,6 +360,8 @@ const handleUploadFiles = () => {
     input.click();
 };
 const handleUploadFolder = () => {
+    if (!checkLoggedIn())
+        return;
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -369,6 +425,22 @@ const handleSync = async () => {
         alert(`Sync failed: ${error.message}`);
     }
 };
+const handleDownload = async (id, type, name) => {
+    if (!checkLoggedIn())
+        return;
+    try {
+        if (type === 'folder') {
+            const result = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.downloadFolderById)(id, name);
+            triggerDownload(result.blob, result.fileName);
+            return;
+        }
+        const result = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.downloadFileById)(id, name);
+        triggerDownload(result.blob, result.fileName);
+    }
+    catch (error) {
+        alert(`Download failed: ${error.message}`);
+    }
+};
 const handleDelete = async (id, type, name, parentId) => {
     if (!confirmAction(`Are you sure you want to delete "${name}"?`))
         return;
@@ -410,6 +482,13 @@ const bindTableEvents = () => {
         el.addEventListener('click', () => {
             const btn = el;
             handleRename(btn.dataset.id, btn.dataset.type, btn.dataset.name, btn.dataset.parent);
+        });
+    });
+    // Download buttons
+    document.querySelectorAll('.sp-btn-download').forEach((el) => {
+        el.addEventListener('click', () => {
+            const btn = el;
+            handleDownload(btn.dataset.id, btn.dataset.type, btn.dataset.name);
         });
     });
     // Delete buttons
@@ -470,6 +549,12 @@ const initHome = async () => {
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
+    const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.getCurrentUser)();
+    if (!user) {
+        renderSignedOutState();
+        history.replaceState({ folderId: _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID }, '', `#folder=${_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID}`);
+        return;
+    }
     // Set initial folder from URL hash before first load
     if (match)
         currentFolderId = match[1];
@@ -543,6 +628,7 @@ var FileExtension;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   apiDelete: function() { return /* binding */ apiDelete; },
+/* harmony export */   apiDownload: function() { return /* binding */ apiDownload; },
 /* harmony export */   apiGet: function() { return /* binding */ apiGet; },
 /* harmony export */   apiPost: function() { return /* binding */ apiPost; },
 /* harmony export */   apiPostForm: function() { return /* binding */ apiPostForm; },
@@ -558,7 +644,7 @@ const apiLog = (...args) => {
     console.log('[API]', ...args);
 };
 // Helper: fetch with retry on 401 (token expired)
-const fetchWithAuthRetry = async (fetchFn, retryOnce = true) => {
+const fetchResponseWithAuthRetry = async (fetchFn, retryOnce = true) => {
     let response = await fetchFn();
     if (response.status === 401 && retryOnce) {
         apiLog('fetchWithAuthRetry:401-detected, clearing token and retrying');
@@ -569,6 +655,10 @@ const fetchWithAuthRetry = async (fetchFn, retryOnce = true) => {
         const err = await response.text();
         throw new Error(`API request failed (${response.status}): ${err}`);
     }
+    return response;
+};
+const fetchWithAuthRetry = async (fetchFn, retryOnce = true) => {
+    const response = await fetchResponseWithAuthRetry(fetchFn, retryOnce);
     // Try to parse JSON, fallback to void
     try {
         return (await response.json());
@@ -581,6 +671,26 @@ const normalizeUrl = (baseUrl, path) => {
     const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return `${normalizedBase}${normalizedPath}`;
+};
+const parseFileNameFromContentDisposition = (headerValue) => {
+    if (!headerValue)
+        return null;
+    const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(headerValue);
+    if (utf8Match?.[1]) {
+        try {
+            return decodeURIComponent(utf8Match[1]);
+        }
+        catch {
+            return utf8Match[1];
+        }
+    }
+    const quotedMatch = /filename="([^"]+)"/i.exec(headerValue);
+    if (quotedMatch?.[1])
+        return quotedMatch[1];
+    const plainMatch = /filename=([^;]+)/i.exec(headerValue);
+    if (plainMatch?.[1])
+        return plainMatch[1].trim();
+    return null;
 };
 const apiGet = async (path) => {
     apiLog('apiGet:start', {
@@ -661,6 +771,22 @@ const apiPostForm = async (path, formData) => {
     };
     return fetchWithAuthRetry(fetchFn);
 };
+const apiDownload = async (path) => {
+    apiLog('apiDownload:start', { path });
+    const fetchFn = async () => {
+        const tokenResult = await (0,_auth_service__WEBPACK_IMPORTED_MODULE_1__.getAccessToken)();
+        return fetch(normalizeUrl(_config_auth_config__WEBPACK_IMPORTED_MODULE_0__.apiConfig.baseUrl, path), {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${tokenResult.accessToken}`,
+            },
+        });
+    };
+    const response = await fetchResponseWithAuthRetry(fetchFn);
+    const blob = await response.blob();
+    const fileName = parseFileNameFromContentDisposition(response.headers.get('Content-Disposition'));
+    return { blob, fileName };
+};
 
 
 /***/ }),
@@ -683,6 +809,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _azure_msal_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @azure/msal-browser */ "./node_modules/@azure/msal-browser/dist/app/PublicClientApplication.mjs");
 /* harmony import */ var _azure_msal_browser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @azure/msal-browser */ "./node_modules/@azure/msal-common/dist-browser/error/InteractionRequiredAuthError.mjs");
 /* harmony import */ var _config_auth_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config/auth.config */ "./src/scripts/config/auth.config.ts");
+/* harmony import */ var _components_grid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/_grid */ "./src/scripts/components/_grid.ts");
+
 
 
 const authority = `https://login.microsoftonline.com/${_config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.tenantId}`;
@@ -733,6 +861,7 @@ const initializeAuth = async () => {
         redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
         apiScopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes,
     });
+    (0,_components_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     await msalInstance.initialize();
     const redirectResult = await msalInstance.handleRedirectPromise();
     if (redirectResult?.account) {
@@ -792,6 +921,7 @@ const acquireTokenInteractive = async () => {
 let cachedAccessToken = null;
 let cachedExpiresOn = null;
 let cachedFromCache = false;
+// Trả về object chứa accessToken và fromCache để debug
 const getAccessToken = async () => {
     setActiveAccountIfMissing();
     authLog('getAccessToken:start');
@@ -882,6 +1012,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   createFolder: function() { return /* binding */ createFolder; },
 /* harmony export */   deleteFile: function() { return /* binding */ deleteFile; },
 /* harmony export */   deleteFolder: function() { return /* binding */ deleteFolder; },
+/* harmony export */   downloadFileById: function() { return /* binding */ downloadFileById; },
+/* harmony export */   downloadFolderById: function() { return /* binding */ downloadFolderById; },
 /* harmony export */   getBreadcrumbPath: function() { return /* binding */ getBreadcrumbPath; },
 /* harmony export */   getFolderById: function() { return /* binding */ getFolderById; },
 /* harmony export */   loadDocuments: function() { return /* binding */ loadDocuments; },
@@ -951,6 +1083,20 @@ const uploadFile = async (file, parentFolderId, uploadedBy) => {
     formData.append('parentFolderId', parentFolderId);
     formData.append('uploadedBy', uploadedBy);
     return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPostForm)(`${FILES_BASE}/upload`, formData);
+};
+const downloadFileById = async (fileId, fallbackName) => {
+    const result = await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDownload)(`${FILES_BASE}/${fileId}/download`);
+    return {
+        blob: result.blob,
+        fileName: result.fileName || fallbackName,
+    };
+};
+const downloadFolderById = async (folderId, fallbackName) => {
+    const result = await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDownload)(`${FOLDERS_BASE}/${folderId}/download`);
+    return {
+        blob: result.blob,
+        fileName: result.fileName || `${fallbackName}.zip`,
+    };
 };
 
 

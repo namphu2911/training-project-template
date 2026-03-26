@@ -1,6 +1,6 @@
 import { FileExtension } from '../models/_enums';
-import { IFolder, IFileItem, IInfoParam, ICreateFolderDto, IUpdateFolderDto, ICreateFileDto, IUpdateFileDto } from '../models/_interfaces';
-import { apiGet, apiPost, apiPut, apiDelete, apiPostForm } from './_api.service';
+import { IFolder, IFileItem, IInfoParam, ICreateFolderDto, IUpdateFolderDto, ICreateFileDto, IUpdateFileDto, ApiDownloadResult } from '../models/_interfaces';
+import { apiGet, apiPost, apiPut, apiDelete, apiPostForm, apiDownload } from './_api.service';
 
 const FOLDERS_BASE = '/api/folders';
 const FILES_BASE = '/api/files';
@@ -82,4 +82,20 @@ export const uploadFile = async (file: File, parentFolderId: string, uploadedBy:
   formData.append('parentFolderId', parentFolderId);
   formData.append('uploadedBy', uploadedBy);
   return apiPostForm<IFileItem>(`${FILES_BASE}/upload`, formData);
+};
+
+export const downloadFileById = async (fileId: string, fallbackName: string): Promise<ApiDownloadResult> => {
+  const result = await apiDownload(`${FILES_BASE}/${fileId}/download`);
+  return {
+    blob: result.blob,
+    fileName: result.fileName || fallbackName,
+  };
+};
+
+export const downloadFolderById = async (folderId: string, fallbackName: string): Promise<ApiDownloadResult> => {
+  const result = await apiDownload(`${FOLDERS_BASE}/${folderId}/download`);
+  return {
+    blob: result.blob,
+    fileName: result.fileName || `${fallbackName}.zip`,
+  };
 };

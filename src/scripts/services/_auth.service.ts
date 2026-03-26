@@ -4,6 +4,8 @@ import {
     InteractionRequiredAuthError,
 } from '@azure/msal-browser';
 import { authConfig, apiConfig } from '../config/auth.config';
+import { showLoading } from '../components/_grid';
+import { AccessTokenResult } from '../models/_interfaces';
 
 const authority = `https://login.microsoftonline.com/${authConfig.tenantId}`;
 
@@ -56,6 +58,7 @@ export const initializeAuth = async () => {
         apiScopes: apiConfig.scopes,
     });
 
+    showLoading();
     await msalInstance.initialize();
     const redirectResult = await msalInstance.handleRedirectPromise();
 
@@ -133,11 +136,6 @@ let cachedExpiresOn: Date | null = null;
 let cachedFromCache: boolean = false;
 
 // Trả về object chứa accessToken và fromCache để debug
-export interface AccessTokenResult {
-    accessToken: string;
-    fromCache: boolean;
-}
-
 export const getAccessToken = async (): Promise<AccessTokenResult> => {
     setActiveAccountIfMissing();
     authLog('getAccessToken:start');

@@ -226,6 +226,7 @@
   cursor: pointer;
 }
 
+.sp-btn-download,
 .sp-btn-rename,
 .sp-btn-delete,
 .row-select {
@@ -236,6 +237,7 @@
 .row-selected {
   background-color: $sp-bg;
 
+  .sp-btn-download,
   .sp-btn-rename,
   .sp-btn-delete,
   .row-select {

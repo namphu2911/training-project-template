@@ -8,6 +8,8 @@ import {
     renameFile,
     deleteFile,
     uploadFile,
+    downloadFileById,
+    downloadFolderById,
     getBreadcrumbPath,
     DOCUMENT_ROOT_ID,
 } from '../services/_storage.service';
@@ -46,9 +48,36 @@ const setAuthUiState = () => {
     }
 };
 
+const renderSignedOutState = () => {
+    const titleEl = document.getElementById('sp-title');
+    const navEl = document.getElementById('sp-breadcrumb');
+    const tbody = document.querySelector('.sp-table tbody');
+
+    if (titleEl) {
+        titleEl.textContent = 'Documents';
+    }
+
+    if (navEl) {
+        navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Documents</li></ol>';
+    }
+
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr class="sp-empty-row">
+                <td colspan="7">
+                    <div class="sp-empty-message">
+                        <iconify-icon icon="fluent-mdl2:permissions" class="sp-empty-icon"></iconify-icon>
+                        <span>Please sign in to load documents</span>
+                    </div>
+                </td>
+            </tr>`;
+    }
+};
+
 // Navigation (with browser history)
 const navigateToFolder = async (folderId: string, pushState = true) => {
     showLoading();
+    console.log('navigateToFolder');
     const folder = await getFolderById(folderId);
     if (!folder) return;
 
@@ -68,6 +97,7 @@ const navigateToFolder = async (folderId: string, pushState = true) => {
 // Reload current folder
 const reloadCurrentFolder = async () => {
     showLoading();
+    console.log('reloadCurrentFolder');
     const folder = await getFolderById(currentFolderId);
     if (!folder) return;
 
@@ -86,8 +116,30 @@ const confirmAction = (message: string) => {
     return confirm(message);
 };
 
+const triggerDownload = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+};
+
+const checkLoggedIn = () => {
+    const user = getCurrentUser();
+    if (!user) {
+        alert('You must be signed in to use this feature.');
+        return false;
+    }
+    return true;
+};
+
 // Navbar action handlers
 const handleNewFolder = async () => {
+    if (!checkLoggedIn()) return;
+
     const name = promptInput('Enter folder name:');
     if (!name || !name.trim()) return;
 
@@ -97,6 +149,8 @@ const handleNewFolder = async () => {
 };
 
 const handleNewFile = async () => {
+    if (!checkLoggedIn()) return;
+
     const name = promptInput('Enter file name (e.g. report.xlsx):');
     if (!name || !name.trim()) return;
 
@@ -117,6 +171,8 @@ const handleNewFile = async () => {
 };
 
 const handleUploadFiles = () => {
+    if (!checkLoggedIn()) return;
+
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -133,6 +189,8 @@ const handleUploadFiles = () => {
 };
 
 const handleUploadFolder = () => {
+    if (!checkLoggedIn()) return;
+
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -206,6 +264,23 @@ const handleSync = async () => {
     }
 };
 
+const handleDownload = async (id: string, type: string, name: string) => {
+    if (!checkLoggedIn()) return;
+
+    try {
+        if (type === 'folder') {
+            const result = await downloadFolderById(id, name);
+            triggerDownload(result.blob, result.fileName);
+            return;
+        }
+
+        const result = await downloadFileById(id, name);
+        triggerDownload(result.blob, result.fileName);
+    } catch (error) {
+        alert(`Download failed: ${(error as Error).message}`);
+    }
+};
+
 const handleDelete = async (id: string, type: string, name: string, parentId?: string) => {
     if (!confirmAction(`Are you sure you want to delete "${name}"?`)) return;
 
@@ -251,6 +326,18 @@ const bindTableEvents = () => {
                 btn.dataset.type!,
                 btn.dataset.name!,
                 btn.dataset.parent
+            );
+        });
+    });
+
+    // Download buttons
+    document.querySelectorAll('.sp-btn-download').forEach((el) => {
+        el.addEventListener('click', () => {
+            const btn = el as HTMLElement;
+            handleDownload(
+                btn.dataset.id!,
+                btn.dataset.type!,
+                btn.dataset.name!
             );
         });
     });
@@ -327,6 +414,14 @@ export const initHome = async () => {
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
+
+    const user = getCurrentUser();
+
+    if (!user) {
+        renderSignedOutState();
+        history.replaceState({ folderId: DOCUMENT_ROOT_ID }, '', `#folder=${DOCUMENT_ROOT_ID}`);
+        return;
+    }
 
     // Set initial folder from URL hash before first load
     if (match)

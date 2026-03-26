@@ -56,3 +56,13 @@ export interface IInfoParam {
   id: string;
   name: string
 };
+
+export interface ApiDownloadResult {
+  blob: Blob;
+  fileName: string | null;
+}
+
+export interface AccessTokenResult {
+  accessToken: string;
+  fromCache: boolean;
+}
