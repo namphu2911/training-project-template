@@ -4,6 +4,7 @@ import { apiGet, apiPost, apiPut, apiDelete, apiPostForm, apiDownload } from './
 
 const FOLDERS_BASE = '/api/folders';
 const FILES_BASE = '/api/files';
+const DOCUMENTS_BASE = '/api/documents';
 export const DOCUMENT_ROOT_ID = '00000000-0000-0000-0000-000000000000';
 
 // Build breadcrumb path by calling API: GET /api/folders/{id}/breadcrumb
@@ -15,13 +16,19 @@ export const getBreadcrumbPath = async (folderId: string): Promise<IInfoParam[]>
 // Load root folder: GET /api/documents/me
 // Returns IFolder (with direct files[] and subFolders[])
 export const loadDocuments = async (): Promise<IFolder> => {
-  return apiGet<IFolder>('/api/documents/me');
+  return apiGet<IFolder>(`${DOCUMENTS_BASE}/me`);
+};
+
+// Load recycle bin root: GET /api/documents/recycle-bin
+// Returns IFolder containing deleted files[] and subFolders[]
+export const loadRecycleBinDocuments = async (): Promise<IFolder> => {
+  return apiGet<IFolder>(`${DOCUMENTS_BASE}/recycle-bin`);
 };
 
 // Get specific folder by ID: GET /api/folders/{id}
 // For root folder, calls GET /api/documents/me instead
 export const getFolderById = async (id: string): Promise<IFolder | undefined> => {
-  const path = id === DOCUMENT_ROOT_ID ? '/api/documents/me' : `${FOLDERS_BASE}/${id}`;
+  const path = id === DOCUMENT_ROOT_ID ? `${DOCUMENTS_BASE}/me` : `${FOLDERS_BASE}/${id}`;
   return await apiGet<IFolder>(path);
 };
 
@@ -42,6 +49,16 @@ export const renameFolder = async (folderId: string, newName: string, modifiedBy
 // Delete folder: DELETE /api/folders/{id}
 export const deleteFolder = async (folderId: string): Promise<void> => {
   return apiDelete(`${FOLDERS_BASE}/${folderId}`);
+};
+
+// Restore soft-deleted folder: POST /api/folders/{id}/restore
+export const restoreFolder = async (folderId: string): Promise<void> => {
+  await apiPost<void>(`${FOLDERS_BASE}/${folderId}/restore`, {});
+};
+
+// Permanently delete folder: DELETE /api/folders/{id}/permanent
+export const deleteFolderPermanently = async (folderId: string): Promise<void> => {
+  return apiDelete(`${FOLDERS_BASE}/${folderId}/permanent`);
 };
 
 // Create file entry: POST /api/files
@@ -72,6 +89,16 @@ export const renameFile = async (
 // Delete file: DELETE /api/files/{id}
 export const deleteFile = async (fileId: string, _parentFolderId: string): Promise<void> => {
   return apiDelete(`${FILES_BASE}/${fileId}`);
+};
+
+// Restore soft-deleted file: POST /api/files/{id}/restore
+export const restoreFile = async (fileId: string): Promise<void> => {
+  await apiPost<void>(`${FILES_BASE}/${fileId}/restore`, {});
+};
+
+// Permanently delete file: DELETE /api/files/{id}/permanent
+export const deleteFilePermanently = async (fileId: string): Promise<void> => {
+  return apiDelete(`${FILES_BASE}/${fileId}/permanent`);
 };
 
 // Upload file: POST /api/files/upload (multipart/form-data)

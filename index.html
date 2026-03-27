@@ -79,6 +79,13 @@
               </button>
             </li>
             <li class="nav-item">
+              <button class="nav-link sp-nav-btn" id="btn-toggle-recycle-bin">
+                <iconify-icon icon="fluent-mdl2:empty-recycle-bin" id="sp-icon-state"
+                  class="sp-icon-pink"></iconify-icon>
+                <span id="sp-recycle-toggle-label">Recycle Bin</span>
+              </button>
+            </li>
+            <li class="nav-item">
               <button class="nav-link sp-nav-btn">
                 <iconify-icon icon="vscode-icons:file-type-excel2" class="sp-icon-green"></iconify-icon>
                 <span>Export to Excel</span>
@@ -134,10 +141,12 @@
               Name <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
             </th>
             <th class="sp-col-modified">
-              Modified <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+              <span id="sp-col-date-label">Modified</span> <iconify-icon icon="fluent-mdl2:chevron-down"
+                class="sp-chevron"></iconify-icon>
             </th>
             <th class="sp-col-modified-by">
-              Modified By <iconify-icon icon="fluent-mdl2:chevron-down" class="sp-chevron"></iconify-icon>
+              <span id="sp-col-user-label">Modified By</span> <iconify-icon icon="fluent-mdl2:chevron-down"
+                class="sp-chevron"></iconify-icon>
             </th>
             <th class="sp-col-add">
               <iconify-icon icon="fluent-mdl2:add"></iconify-icon> Add column

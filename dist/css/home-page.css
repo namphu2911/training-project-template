@@ -425,6 +425,7 @@ body {
 
 .sp-btn-download,
 .sp-btn-rename,
+.sp-btn-restore,
 .sp-btn-delete,
 .row-select {
   visibility: hidden;
@@ -436,6 +437,7 @@ body {
 }
 .row-selected .sp-btn-download,
 .row-selected .sp-btn-rename,
+.row-selected .sp-btn-restore,
 .row-selected .sp-btn-delete,
 .row-selected .row-select {
   visibility: visible;

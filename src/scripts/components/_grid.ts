@@ -1,5 +1,5 @@
 import { FileExtension } from '../models/_enums';
-import { IFolder, IFileItem, IInfoParam } from '../models/_interfaces';
+import { IFolder, IFileItem, IInfoParam, TableViewMode } from '../models/_interfaces';
 
 // Icon mapping
 const fileIconMap: Record<FileExtension, { icon: string; cssClass: string }> = {
@@ -47,7 +47,32 @@ const escapeHtml = (text: string) => {
 };
 
 // Render helpers
-const renderFolderRow = (folder: IFolder) => {
+const renderFolderRow = (folder: IFolder, mode: TableViewMode) => {
+  const dateLabel = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+  const userLabel = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+
+  const folderNameCell = mode === 'recycle-bin'
+    ? `<span class="sp-value">${escapeHtml(folder.name)}</span>`
+    : `<span class="sp-value sp-folder-link" data-folder-id="${folder.id}">${escapeHtml(folder.name)}</span>`;
+  const actionButtons = mode === 'recycle-bin'
+    ? `
+      <button class="btn btn-sm btn-outline-success sp-btn-restore" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Restore">
+        <iconify-icon icon="fluent-mdl2:undo"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete permanently">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`
+    : `
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
+        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`;
+
   return `
   <tr data-id="${folder.id}" data-type="folder">
     <td class="sp-col-select">
@@ -58,30 +83,43 @@ const renderFolderRow = (folder: IFolder) => {
     </td>
     <td class="sp-col-name" data-label="Name">
       <span class="sp-name-content">
-        <span class="sp-value sp-folder-link" data-folder-id="${folder.id}">${escapeHtml(folder.name)}</span>
+        ${folderNameCell}
       </span>
     </td>
-    <td class="sp-col-modified" data-label="Modified">${formatDate(folder.modifiedAt)}</td>
-    <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(folder.modifiedBy)}</td>
+    <td class="sp-col-modified" data-label="${dateLabel}">${formatDate(folder.modifiedAt)}</td>
+    <td class="sp-col-modified-by" data-label="${userLabel}">${escapeHtml(folder.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
-      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
-        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
-        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete">
-        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
-      </button>
+      ${actionButtons}
     </td>
   </tr>`;
 }
 
-const renderFileRow = (file: IFileItem) => {
+const renderFileRow = (file: IFileItem, mode: TableViewMode) => {
   const ext = file.extension.replace(/^\./, '').toLowerCase();
   const iconInfo = fileIconMap[ext as FileExtension] ?? fileIconMap[FileExtension.Other];
   const displayName = ext === FileExtension.Other ? file.name : `${file.name}.${ext}`;
+
+  const dateLabel = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+  const userLabel = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+  const actionButtons = mode === 'recycle-bin'
+    ? `
+      <button class="btn btn-sm btn-outline-success sp-btn-restore" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Restore">
+        <iconify-icon icon="fluent-mdl2:undo"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete permanently">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`
+    : `
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
+        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`;
 
   return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
@@ -96,19 +134,11 @@ const renderFileRow = (file: IFileItem) => {
         <span class="sp-value">${escapeHtml(displayName)}</span>
       </span>
     </td>
-    <td class="sp-col-modified" data-label="Modified">${formatDate(file.modifiedAt)}</td>
-    <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(file.modifiedBy)}</td>
+    <td class="sp-col-modified" data-label="${dateLabel}">${formatDate(file.modifiedAt)}</td>
+    <td class="sp-col-modified-by" data-label="${userLabel}">${escapeHtml(file.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
-      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
-        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
-        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete">
-        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
-      </button>
+      ${actionButtons}
     </td>
   </tr>`;
 };
@@ -132,15 +162,15 @@ export const showLoading = () => {
 };
 
 // Render document table
-export const renderDocumentTable = (folder: IFolder) => {
+export const renderDocumentTable = (folder: IFolder, mode: TableViewMode = 'documents') => {
   const tbody = document.querySelector('.sp-table tbody');
   if (!tbody) return;
 
   const rows: string[] = [];
 
   // Folders first, then files (no back row – breadcrumb handles navigation)
-  folder.subFolders.forEach((sub) => rows.push(renderFolderRow(sub)));
-  folder.files.forEach((file) => rows.push(renderFileRow(file)));
+  folder.subFolders.forEach((sub) => rows.push(renderFolderRow(sub, mode)));
+  folder.files.forEach((file) => rows.push(renderFileRow(file, mode)));
 
   if (folder.subFolders.length === 0 && folder.files.length === 0) {
     rows.push(`
@@ -186,3 +216,4 @@ export const renderBreadcrumb = (path: IInfoParam[], onNavigate: (folderId: stri
     });
   });
 };
+export { TableViewMode };

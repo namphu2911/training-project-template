@@ -64,7 +64,30 @@ const escapeHtml = (text) => {
         .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 };
 // Render helpers
-const renderFolderRow = (folder) => {
+const renderFolderRow = (folder, mode) => {
+    const dateLabel = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+    const userLabel = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+    const folderNameCell = mode === 'recycle-bin'
+        ? `<span class="sp-value">${escapeHtml(folder.name)}</span>`
+        : `<span class="sp-value sp-folder-link" data-folder-id="${folder.id}">${escapeHtml(folder.name)}</span>`;
+    const actionButtons = mode === 'recycle-bin'
+        ? `
+      <button class="btn btn-sm btn-outline-success sp-btn-restore" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Restore">
+        <iconify-icon icon="fluent-mdl2:undo"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete permanently">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`
+        : `
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
+        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`;
     return `
   <tr data-id="${folder.id}" data-type="folder">
     <td class="sp-col-select">
@@ -75,29 +98,41 @@ const renderFolderRow = (folder) => {
     </td>
     <td class="sp-col-name" data-label="Name">
       <span class="sp-name-content">
-        <span class="sp-value sp-folder-link" data-folder-id="${folder.id}">${escapeHtml(folder.name)}</span>
+        ${folderNameCell}
       </span>
     </td>
-    <td class="sp-col-modified" data-label="Modified">${formatDate(folder.modifiedAt)}</td>
-    <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(folder.modifiedBy)}</td>
+    <td class="sp-col-modified" data-label="${dateLabel}">${formatDate(folder.modifiedAt)}</td>
+    <td class="sp-col-modified-by" data-label="${userLabel}">${escapeHtml(folder.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
-      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Download">
-        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Rename">
-        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${folder.id}" data-type="folder" data-name="${escapeHtml(folder.name)}" title="Delete">
-        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
-      </button>
+      ${actionButtons}
     </td>
   </tr>`;
 };
-const renderFileRow = (file) => {
+const renderFileRow = (file, mode) => {
     const ext = file.extension.replace(/^\./, '').toLowerCase();
     const iconInfo = fileIconMap[ext] ?? fileIconMap[_models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other];
     const displayName = ext === _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other ? file.name : `${file.name}.${ext}`;
+    const dateLabel = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+    const userLabel = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+    const actionButtons = mode === 'recycle-bin'
+        ? `
+      <button class="btn btn-sm btn-outline-success sp-btn-restore" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Restore">
+        <iconify-icon icon="fluent-mdl2:undo"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete permanently">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`
+        : `
+      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
+        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
+        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete">
+        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
+      </button>`;
     return `
   <tr data-id="${file.id}" data-type="file" data-parent="${file.parentFolderId}">
     <td class="sp-col-select">
@@ -111,19 +146,11 @@ const renderFileRow = (file) => {
         <span class="sp-value">${escapeHtml(displayName)}</span>
       </span>
     </td>
-    <td class="sp-col-modified" data-label="Modified">${formatDate(file.modifiedAt)}</td>
-    <td class="sp-col-modified-by" data-label="Modified By">${escapeHtml(file.modifiedBy)}</td>
+    <td class="sp-col-modified" data-label="${dateLabel}">${formatDate(file.modifiedAt)}</td>
+    <td class="sp-col-modified-by" data-label="${userLabel}">${escapeHtml(file.modifiedBy)}</td>
     <td class="sp-col-add"></td>
     <td class="sp-col-actions" data-label="">
-      <button class="btn btn-sm btn-outline-secondary sp-btn-download" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" title="Download">
-        <iconify-icon icon="fluent-mdl2:download"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-primary sp-btn-rename" data-id="${file.id}" data-type="file" data-name="${escapeHtml(file.name)}" data-parent="${file.parentFolderId}" title="Rename">
-        <iconify-icon icon="fluent-mdl2:rename"></iconify-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-danger sp-btn-delete" data-id="${file.id}" data-type="file" data-name="${escapeHtml(displayName)}" data-parent="${file.parentFolderId}" title="Delete">
-        <iconify-icon icon="fluent-mdl2:delete"></iconify-icon>
-      </button>
+      ${actionButtons}
     </td>
   </tr>`;
 };
@@ -145,14 +172,14 @@ const showLoading = () => {
     }
 };
 // Render document table
-const renderDocumentTable = (folder) => {
+const renderDocumentTable = (folder, mode = 'documents') => {
     const tbody = document.querySelector('.sp-table tbody');
     if (!tbody)
         return;
     const rows = [];
     // Folders first, then files (no back row – breadcrumb handles navigation)
-    folder.subFolders.forEach((sub) => rows.push(renderFolderRow(sub)));
-    folder.files.forEach((file) => rows.push(renderFileRow(file)));
+    folder.subFolders.forEach((sub) => rows.push(renderFolderRow(sub, mode)));
+    folder.files.forEach((file) => rows.push(renderFileRow(file, mode)));
     if (folder.subFolders.length === 0 && folder.files.length === 0) {
         rows.push(`
       <tr class="sp-empty-row">
@@ -217,6 +244,7 @@ __webpack_require__.r(__webpack_exports__);
 // State
 let currentFolderId = _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID;
 let currentUserLabel = 'Current User';
+let currentViewMode = 'documents';
 const uiLog = (...args) => {
     console.log('[UI]', ...args);
 };
@@ -239,6 +267,45 @@ const setAuthUiState = () => {
         logoutBtn.style.display = user ? 'flex' : 'none';
     }
 };
+const setElementVisibility = (id, visible) => {
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+    const navItem = element.closest('.nav-item');
+    const target = navItem || element;
+    target.style.display = visible ? '' : 'none';
+};
+const setViewUiState = (mode) => {
+    const inRecycleBin = mode === 'recycle-bin';
+    const toggleLabel = document.getElementById('sp-recycle-toggle-label');
+    const toggleIcon = document.getElementById('sp-icon-state');
+    setElementVisibility('btn-new-folder', !inRecycleBin);
+    setElementVisibility('btn-upload-folder', !inRecycleBin);
+    if (toggleLabel) {
+        toggleLabel.textContent = inRecycleBin ? 'Back to Documents' : 'Recycle Bin';
+    }
+    if (toggleIcon) {
+        toggleIcon.setAttribute('icon', inRecycleBin ? 'fluent-mdl2:back' : 'fluent-mdl2:empty-recycle-bin');
+    }
+};
+const setTableHeaderLabels = (mode) => {
+    const dateLabelEl = document.getElementById('sp-col-date-label');
+    const userLabelEl = document.getElementById('sp-col-user-label');
+    if (dateLabelEl) {
+        dateLabelEl.textContent = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+    }
+    if (userLabelEl) {
+        userLabelEl.textContent = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+    }
+};
+const renderRecycleBinBreadcrumb = () => {
+    const titleEl = document.getElementById('sp-title');
+    const navEl = document.getElementById('sp-breadcrumb');
+    if (!titleEl || !navEl)
+        return;
+    titleEl.textContent = 'Recycle Bin';
+    navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Recycle Bin</li></ol>';
+};
 const renderSignedOutState = () => {
     const titleEl = document.getElementById('sp-title');
     const navEl = document.getElementById('sp-breadcrumb');
@@ -246,6 +313,9 @@ const renderSignedOutState = () => {
     if (titleEl) {
         titleEl.textContent = 'Documents';
     }
+    currentViewMode = 'documents';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
     if (navEl) {
         navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Documents</li></ol>';
     }
@@ -263,6 +333,9 @@ const renderSignedOutState = () => {
 };
 // Navigation (with browser history)
 const navigateToFolder = async (folderId, pushState = true) => {
+    currentViewMode = 'documents';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     console.log('navigateToFolder');
     const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(folderId);
@@ -271,24 +344,33 @@ const navigateToFolder = async (folderId, pushState = true) => {
     currentFolderId = folderId;
     // Push to browser history so back/forward works
     if (pushState) {
-        history.pushState({ folderId }, '', `#folder=${folderId}`);
+        history.pushState({ mode: currentViewMode, folderId }, '', `#folder=${folderId}`);
     }
     const path = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(folderId);
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder);
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder, currentViewMode);
     bindTableEvents();
 };
-// Reload current folder
-const reloadCurrentFolder = async () => {
+const openRecycleBin = async (pushState = true) => {
+    currentViewMode = 'recycle-bin';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
-    console.log('reloadCurrentFolder');
-    const folder = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getFolderById)(currentFolderId);
-    if (!folder)
-        return;
-    const path = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.getBreadcrumbPath)(currentFolderId);
-    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderBreadcrumb)(path, (id) => navigateToFolder(id));
-    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(folder);
+    const recycleBinRoot = await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.loadRecycleBinDocuments)();
+    renderRecycleBinBreadcrumb();
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.renderDocumentTable)(recycleBinRoot, currentViewMode);
     bindTableEvents();
+    if (pushState) {
+        history.pushState({ mode: currentViewMode, folderId: currentFolderId }, '', '#recycle-bin');
+    }
+};
+// Reload current view
+const reloadCurrentView = async () => {
+    if (currentViewMode === 'recycle-bin') {
+        await openRecycleBin(false);
+        return;
+    }
+    await navigateToFolder(currentFolderId, false);
 };
 // Simple prompt-based modals
 const promptInput = (title, defaultValue = '') => {
@@ -324,7 +406,7 @@ const handleNewFolder = async () => {
         return;
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFolder)(name.trim(), currentFolderId, currentUserLabel);
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 const handleNewFile = async () => {
     if (!checkLoggedIn())
@@ -341,7 +423,7 @@ const handleNewFile = async () => {
     const extension = isKnownExt ? rawExt : _models_enums__WEBPACK_IMPORTED_MODULE_0__.FileExtension.Other;
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
     await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.createFile)(fileName, extension, currentFolderId, currentUserLabel);
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 const handleUploadFiles = () => {
     if (!checkLoggedIn())
@@ -355,7 +437,7 @@ const handleUploadFiles = () => {
         (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
         const promises = Array.from(input.files).map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.uploadFile)(file, currentFolderId, currentUserLabel));
         await Promise.all(promises);
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     };
     input.click();
 };
@@ -381,12 +463,14 @@ const handleUploadFolder = () => {
         // Upload all files into that folder (flat – ignoring nested subdirs for simplicity)
         const promises = files.map((file) => (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.uploadFile)(file, topFolder.id, currentUserLabel));
         await Promise.all(promises);
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     };
     input.click();
 };
 // Row item action handlers (rename and delete) (both files and folders)
 const handleRename = async (id, type, currentName, parentId) => {
+    if (currentViewMode === 'recycle-bin')
+        return;
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName)
         return;
@@ -397,7 +481,7 @@ const handleRename = async (id, type, currentName, parentId) => {
     else if (parentId) {
         await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.renameFile)(id, parentId, newName.trim(), currentUserLabel);
     }
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 const handleLogin = async () => {
     uiLog('handleLogin:clicked');
@@ -419,7 +503,7 @@ const handleLogout = async () => {
 };
 const handleSync = async () => {
     try {
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     }
     catch (error) {
         alert(`Sync failed: ${error.message}`);
@@ -442,41 +526,78 @@ const handleDownload = async (id, type, name) => {
     }
 };
 const handleDelete = async (id, type, name, parentId) => {
-    if (!confirmAction(`Are you sure you want to delete "${name}"?`))
+    const isRecycleBin = currentViewMode === 'recycle-bin';
+    const message = isRecycleBin
+        ? `Delete "${name}" permanently from database?`
+        : `Are you sure you want to delete "${name}"?`;
+    if (!confirmAction(message))
         return;
     (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
-    if (type === 'folder') {
+    if (isRecycleBin) {
+        if (type === 'folder') {
+            await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFolderPermanently)(id);
+        }
+        else {
+            await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFilePermanently)(id);
+        }
+    }
+    else if (type === 'folder') {
         await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFolder)(id);
     }
     else if (parentId) {
         await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.deleteFile)(id, parentId);
     }
-    await reloadCurrentFolder();
+    await reloadCurrentView();
+};
+const handleRestore = async (id, type, name) => {
+    if (currentViewMode !== 'recycle-bin')
+        return;
+    if (!confirmAction(`Restore "${name}"?`))
+        return;
+    (0,_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    if (type === 'folder') {
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.restoreFolder)(id);
+    }
+    else {
+        await (0,_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.restoreFile)(id);
+    }
+    await reloadCurrentView();
+};
+const handleToggleRecycleBin = async () => {
+    if (currentViewMode === 'recycle-bin') {
+        await navigateToFolder(currentFolderId);
+        return;
+    }
+    await openRecycleBin();
 };
 // Event binding
 // Table rows
 const bindTableEvents = () => {
     // Folder link click (open folder)
-    document.querySelectorAll('.sp-folder-link').forEach((el) => {
-        el.addEventListener('click', (e) => {
-            e.preventDefault();
-            const folderId = el.dataset.folderId;
-            if (folderId)
-                navigateToFolder(folderId);
+    if (currentViewMode === 'documents') {
+        document.querySelectorAll('.sp-folder-link').forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const folderId = el.dataset.folderId;
+                if (folderId)
+                    navigateToFolder(folderId);
+            });
         });
-    });
+    }
     // Table row double click (open folder)
-    document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
-        el.addEventListener('dblclick', (e) => {
-            if (e.target.closest('.row-select'))
-                return;
-            const type = el.dataset.type;
-            const id = el.dataset.id;
-            if (type === 'folder' && id) {
-                navigateToFolder(id);
-            }
+    if (currentViewMode === 'documents') {
+        document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
+            el.addEventListener('dblclick', (e) => {
+                if (e.target.closest('.row-select'))
+                    return;
+                const type = el.dataset.type;
+                const id = el.dataset.id;
+                if (type === 'folder' && id) {
+                    navigateToFolder(id);
+                }
+            });
         });
-    });
+    }
     // Rename buttons
     document.querySelectorAll('.sp-btn-rename').forEach((el) => {
         el.addEventListener('click', () => {
@@ -496,6 +617,13 @@ const bindTableEvents = () => {
         el.addEventListener('click', () => {
             const btn = el;
             handleDelete(btn.dataset.id, btn.dataset.type, btn.dataset.name, btn.dataset.parent);
+        });
+    });
+    // Restore buttons
+    document.querySelectorAll('.sp-btn-restore').forEach((el) => {
+        el.addEventListener('click', () => {
+            const btn = el;
+            handleRestore(btn.dataset.id, btn.dataset.type, btn.dataset.name);
         });
     });
 };
@@ -524,6 +652,7 @@ const bindNavbarEvents = () => {
     document.getElementById('btn-upload-files')?.addEventListener('click', handleUploadFiles);
     document.getElementById('btn-upload-folder')?.addEventListener('click', handleUploadFolder);
     document.getElementById('btn-sync')?.addEventListener('click', handleSync);
+    document.getElementById('btn-toggle-recycle-bin')?.addEventListener('click', handleToggleRecycleBin);
     const loginBtn = document.getElementById('btn-auth-login');
     if (!loginBtn) {
         uiLog('bindNavbarEvents:btn-auth-login not found');
@@ -534,6 +663,11 @@ const bindNavbarEvents = () => {
 // Browser history (back / forward)
 const bindHistoryEvents = () => {
     window.addEventListener('popstate', (event) => {
+        const mode = event.state?.mode;
+        if (mode === 'recycle-bin') {
+            openRecycleBin(false);
+            return;
+        }
         const folderId = event.state?.folderId || _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID;
         navigateToFolder(folderId, false); // false = don't push again
     });
@@ -546,21 +680,29 @@ const initHome = async () => {
     bindNavbarEvents();
     bindHistoryEvents();
     bindRowSelectEvents();
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
+    const isRecycleBinHash = hash === '#recycle-bin';
     const user = (0,_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.getCurrentUser)();
     if (!user) {
         renderSignedOutState();
-        history.replaceState({ folderId: _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID }, '', `#folder=${_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID}`);
+        history.replaceState({ mode: 'documents', folderId: _services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID }, '', `#folder=${_services_storage_service__WEBPACK_IMPORTED_MODULE_1__.DOCUMENT_ROOT_ID}`);
+        return;
+    }
+    if (isRecycleBinHash) {
+        await openRecycleBin(false);
+        history.replaceState({ mode: 'recycle-bin', folderId: currentFolderId }, '', '#recycle-bin');
         return;
     }
     // Set initial folder from URL hash before first load
     if (match)
         currentFolderId = match[1];
-    await reloadCurrentFolder();
+    await reloadCurrentView();
     // Record initial state for browser back/forward (replace, not push)
-    history.replaceState({ folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
+    history.replaceState({ mode: 'documents', folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
 };
 
 
@@ -1011,20 +1153,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   createFile: function() { return /* binding */ createFile; },
 /* harmony export */   createFolder: function() { return /* binding */ createFolder; },
 /* harmony export */   deleteFile: function() { return /* binding */ deleteFile; },
+/* harmony export */   deleteFilePermanently: function() { return /* binding */ deleteFilePermanently; },
 /* harmony export */   deleteFolder: function() { return /* binding */ deleteFolder; },
+/* harmony export */   deleteFolderPermanently: function() { return /* binding */ deleteFolderPermanently; },
 /* harmony export */   downloadFileById: function() { return /* binding */ downloadFileById; },
 /* harmony export */   downloadFolderById: function() { return /* binding */ downloadFolderById; },
 /* harmony export */   getBreadcrumbPath: function() { return /* binding */ getBreadcrumbPath; },
 /* harmony export */   getFolderById: function() { return /* binding */ getFolderById; },
 /* harmony export */   loadDocuments: function() { return /* binding */ loadDocuments; },
+/* harmony export */   loadRecycleBinDocuments: function() { return /* binding */ loadRecycleBinDocuments; },
 /* harmony export */   renameFile: function() { return /* binding */ renameFile; },
 /* harmony export */   renameFolder: function() { return /* binding */ renameFolder; },
+/* harmony export */   restoreFile: function() { return /* binding */ restoreFile; },
+/* harmony export */   restoreFolder: function() { return /* binding */ restoreFolder; },
 /* harmony export */   uploadFile: function() { return /* binding */ uploadFile; }
 /* harmony export */ });
 /* harmony import */ var _api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./_api.service */ "./src/scripts/services/_api.service.ts");
 
 const FOLDERS_BASE = '/api/folders';
 const FILES_BASE = '/api/files';
+const DOCUMENTS_BASE = '/api/documents';
 const DOCUMENT_ROOT_ID = '00000000-0000-0000-0000-000000000000';
 // Build breadcrumb path by calling API: GET /api/folders/{id}/breadcrumb
 // Returns [{ id, name }, ...] from root to current folder
@@ -1034,12 +1182,17 @@ const getBreadcrumbPath = async (folderId) => {
 // Load root folder: GET /api/documents/me
 // Returns IFolder (with direct files[] and subFolders[])
 const loadDocuments = async () => {
-    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)('/api/documents/me');
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)(`${DOCUMENTS_BASE}/me`);
+};
+// Load recycle bin root: GET /api/documents/recycle-bin
+// Returns IFolder containing deleted files[] and subFolders[]
+const loadRecycleBinDocuments = async () => {
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)(`${DOCUMENTS_BASE}/recycle-bin`);
 };
 // Get specific folder by ID: GET /api/folders/{id}
 // For root folder, calls GET /api/documents/me instead
 const getFolderById = async (id) => {
-    const path = id === DOCUMENT_ROOT_ID ? '/api/documents/me' : `${FOLDERS_BASE}/${id}`;
+    const path = id === DOCUMENT_ROOT_ID ? `${DOCUMENTS_BASE}/me` : `${FOLDERS_BASE}/${id}`;
     return await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiGet)(path);
 };
 // Create folder: POST /api/folders
@@ -1058,6 +1211,14 @@ const renameFolder = async (folderId, newName, modifiedBy) => {
 const deleteFolder = async (folderId) => {
     return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FOLDERS_BASE}/${folderId}`);
 };
+// Restore soft-deleted folder: POST /api/folders/{id}/restore
+const restoreFolder = async (folderId) => {
+    await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPost)(`${FOLDERS_BASE}/${folderId}/restore`, {});
+};
+// Permanently delete folder: DELETE /api/folders/{id}/permanent
+const deleteFolderPermanently = async (folderId) => {
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FOLDERS_BASE}/${folderId}/permanent`);
+};
 // Create file entry: POST /api/files
 // Body: ICreateFileDto { name, extension, parentFolderId, createdBy }
 const createFile = async (name, extension, parentFolderId, createdBy) => {
@@ -1074,6 +1235,14 @@ const renameFile = async (fileId, _parentFolderId, newName, modifiedBy) => {
 // Delete file: DELETE /api/files/{id}
 const deleteFile = async (fileId, _parentFolderId) => {
     return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FILES_BASE}/${fileId}`);
+};
+// Restore soft-deleted file: POST /api/files/{id}/restore
+const restoreFile = async (fileId) => {
+    await (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiPost)(`${FILES_BASE}/${fileId}/restore`, {});
+};
+// Permanently delete file: DELETE /api/files/{id}/permanent
+const deleteFilePermanently = async (fileId) => {
+    return (0,_api_service__WEBPACK_IMPORTED_MODULE_0__.apiDelete)(`${FILES_BASE}/${fileId}/permanent`);
 };
 // Upload file: POST /api/files/upload (multipart/form-data)
 // FormData fields: file (binary), parentFolderId (string), uploadedBy (string)

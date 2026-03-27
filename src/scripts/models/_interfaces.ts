@@ -66,3 +66,5 @@ export interface AccessTokenResult {
   accessToken: string;
   fromCache: boolean;
 }
+
+export type TableViewMode = 'documents' | 'recycle-bin';

@@ -4,21 +4,27 @@ import {
     createFolder,
     renameFolder,
     deleteFolder,
+    deleteFolderPermanently,
+    restoreFolder,
     createFile,
     renameFile,
     deleteFile,
+    deleteFilePermanently,
+    restoreFile,
     uploadFile,
     downloadFileById,
     downloadFolderById,
     getBreadcrumbPath,
+    loadRecycleBinDocuments,
     DOCUMENT_ROOT_ID,
 } from '../services/_storage.service';
 import { initializeAuth, login, logout, getCurrentUser } from '../services/_auth.service';
-import { renderDocumentTable, showLoading, renderBreadcrumb } from './_grid';
+import { renderDocumentTable, showLoading, renderBreadcrumb, TableViewMode } from './_grid';
 
 // State
 let currentFolderId = DOCUMENT_ROOT_ID;
 let currentUserLabel = 'Current User';
+let currentViewMode: TableViewMode = 'documents';
 
 const uiLog = (...args: unknown[]) => {
     console.log('[UI]', ...args);
@@ -48,6 +54,53 @@ const setAuthUiState = () => {
     }
 };
 
+const setElementVisibility = (id: string, visible: boolean) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const navItem = element.closest('.nav-item') as HTMLElement | null;
+    const target = navItem || (element as HTMLElement);
+    target.style.display = visible ? '' : 'none';
+};
+
+const setViewUiState = (mode: TableViewMode) => {
+    const inRecycleBin = mode === 'recycle-bin';
+    const toggleLabel = document.getElementById('sp-recycle-toggle-label');
+    const toggleIcon = document.getElementById('sp-icon-state') as HTMLElement | null;
+
+    setElementVisibility('btn-new-folder', !inRecycleBin);
+    setElementVisibility('btn-upload-folder', !inRecycleBin);
+
+    if (toggleLabel) {
+        toggleLabel.textContent = inRecycleBin ? 'Back to Documents' : 'Recycle Bin';
+    }
+    if (toggleIcon) {
+        toggleIcon.setAttribute('icon', inRecycleBin ? 'fluent-mdl2:back' : 'fluent-mdl2:empty-recycle-bin');
+    }
+};
+
+const setTableHeaderLabels = (mode: TableViewMode) => {
+    const dateLabelEl = document.getElementById('sp-col-date-label');
+    const userLabelEl = document.getElementById('sp-col-user-label');
+
+    if (dateLabelEl) {
+        dateLabelEl.textContent = mode === 'recycle-bin' ? 'Deleted At' : 'Modified';
+    }
+
+    if (userLabelEl) {
+        userLabelEl.textContent = mode === 'recycle-bin' ? 'Deleted By' : 'Modified By';
+    }
+};
+
+const renderRecycleBinBreadcrumb = () => {
+    const titleEl = document.getElementById('sp-title');
+    const navEl = document.getElementById('sp-breadcrumb');
+    if (!titleEl || !navEl) return;
+
+    titleEl.textContent = 'Recycle Bin';
+    navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Recycle Bin</li></ol>';
+};
+
 const renderSignedOutState = () => {
     const titleEl = document.getElementById('sp-title');
     const navEl = document.getElementById('sp-breadcrumb');
@@ -56,6 +109,10 @@ const renderSignedOutState = () => {
     if (titleEl) {
         titleEl.textContent = 'Documents';
     }
+
+    currentViewMode = 'documents';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
 
     if (navEl) {
         navEl.innerHTML = '<ol class="breadcrumb sp-breadcrumb"><li class="breadcrumb-item active" aria-current="page">Documents</li></ol>';
@@ -76,6 +133,10 @@ const renderSignedOutState = () => {
 
 // Navigation (with browser history)
 const navigateToFolder = async (folderId: string, pushState = true) => {
+    currentViewMode = 'documents';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
+
     showLoading();
     console.log('navigateToFolder');
     const folder = await getFolderById(folderId);
@@ -85,26 +146,40 @@ const navigateToFolder = async (folderId: string, pushState = true) => {
 
     // Push to browser history so back/forward works
     if (pushState) {
-        history.pushState({ folderId }, '', `#folder=${folderId}`);
+        history.pushState({ mode: currentViewMode, folderId }, '', `#folder=${folderId}`);
     }
 
     const path = await getBreadcrumbPath(folderId);
     renderBreadcrumb(path, (id) => navigateToFolder(id));
-    renderDocumentTable(folder);
+    renderDocumentTable(folder, currentViewMode);
     bindTableEvents();
 };
 
-// Reload current folder
-const reloadCurrentFolder = async () => {
-    showLoading();
-    console.log('reloadCurrentFolder');
-    const folder = await getFolderById(currentFolderId);
-    if (!folder) return;
+const openRecycleBin = async (pushState = true) => {
+    currentViewMode = 'recycle-bin';
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
 
-    const path = await getBreadcrumbPath(currentFolderId);
-    renderBreadcrumb(path, (id) => navigateToFolder(id));
-    renderDocumentTable(folder);
+    showLoading();
+    const recycleBinRoot = await loadRecycleBinDocuments();
+
+    renderRecycleBinBreadcrumb();
+    renderDocumentTable(recycleBinRoot, currentViewMode);
     bindTableEvents();
+
+    if (pushState) {
+        history.pushState({ mode: currentViewMode, folderId: currentFolderId }, '', '#recycle-bin');
+    }
+};
+
+// Reload current view
+const reloadCurrentView = async () => {
+    if (currentViewMode === 'recycle-bin') {
+        await openRecycleBin(false);
+        return;
+    }
+
+    await navigateToFolder(currentFolderId, false);
 };
 
 // Simple prompt-based modals
@@ -145,7 +220,7 @@ const handleNewFolder = async () => {
 
     showLoading();
     await createFolder(name.trim(), currentFolderId, currentUserLabel);
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 
 const handleNewFile = async () => {
@@ -167,7 +242,7 @@ const handleNewFile = async () => {
 
     showLoading();
     await createFile(fileName, extension, currentFolderId, currentUserLabel);
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 
 const handleUploadFiles = () => {
@@ -183,7 +258,7 @@ const handleUploadFiles = () => {
             uploadFile(file, currentFolderId, currentUserLabel)
         );
         await Promise.all(promises);
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     };
     input.click();
 };
@@ -218,13 +293,15 @@ const handleUploadFolder = () => {
             uploadFile(file, topFolder.id, currentUserLabel)
         );
         await Promise.all(promises);
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     };
     input.click();
 };
 
 // Row item action handlers (rename and delete) (both files and folders)
 const handleRename = async (id: string, type: string, currentName: string, parentId?: string) => {
+    if (currentViewMode === 'recycle-bin') return;
+
     const newName = promptInput(`Rename "${currentName}" to:`, currentName);
     if (!newName || !newName.trim() || newName.trim() === currentName) return;
 
@@ -234,7 +311,7 @@ const handleRename = async (id: string, type: string, currentName: string, paren
     } else if (parentId) {
         await renameFile(id, parentId, newName.trim(), currentUserLabel);
     }
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 };
 
 const handleLogin = async () => {
@@ -258,7 +335,7 @@ const handleLogout = async () => {
 
 const handleSync = async () => {
     try {
-        await reloadCurrentFolder();
+        await reloadCurrentView();
     } catch (error) {
         alert(`Sync failed: ${(error as Error).message}`);
     }
@@ -282,40 +359,77 @@ const handleDownload = async (id: string, type: string, name: string) => {
 };
 
 const handleDelete = async (id: string, type: string, name: string, parentId?: string) => {
-    if (!confirmAction(`Are you sure you want to delete "${name}"?`)) return;
+    const isRecycleBin = currentViewMode === 'recycle-bin';
+    const message = isRecycleBin
+        ? `Delete "${name}" permanently from database?`
+        : `Are you sure you want to delete "${name}"?`;
+
+    if (!confirmAction(message)) return;
 
     showLoading();
-    if (type === 'folder') {
+    if (isRecycleBin) {
+        if (type === 'folder') {
+            await deleteFolderPermanently(id);
+        } else {
+            await deleteFilePermanently(id);
+        }
+    } else if (type === 'folder') {
         await deleteFolder(id);
     } else if (parentId) {
         await deleteFile(id, parentId);
     }
-    await reloadCurrentFolder();
+    await reloadCurrentView();
+};
+
+const handleRestore = async (id: string, type: string, name: string) => {
+    if (currentViewMode !== 'recycle-bin') return;
+    if (!confirmAction(`Restore "${name}"?`)) return;
+
+    showLoading();
+    if (type === 'folder') {
+        await restoreFolder(id);
+    } else {
+        await restoreFile(id);
+    }
+    await reloadCurrentView();
+};
+
+const handleToggleRecycleBin = async () => {
+    if (currentViewMode === 'recycle-bin') {
+        await navigateToFolder(currentFolderId);
+        return;
+    }
+
+    await openRecycleBin();
 };
 
 // Event binding
 // Table rows
 const bindTableEvents = () => {
     // Folder link click (open folder)
-    document.querySelectorAll('.sp-folder-link').forEach((el) => {
-        el.addEventListener('click', (e) => {
-            e.preventDefault();
-            const folderId = (el as HTMLElement).dataset.folderId;
-            if (folderId) navigateToFolder(folderId);
+    if (currentViewMode === 'documents') {
+        document.querySelectorAll('.sp-folder-link').forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const folderId = (el as HTMLElement).dataset.folderId;
+                if (folderId) navigateToFolder(folderId);
+            });
         });
-    });
+    }
 
     // Table row double click (open folder)
-    document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
-        el.addEventListener('dblclick', (e) => {
-            if ((e.target as HTMLElement).closest('.row-select')) return;
-            const type = (el as HTMLElement).dataset.type;
-            const id = (el as HTMLElement).dataset.id;
-            if (type === 'folder' && id) {
-                navigateToFolder(id);
-            }
+    if (currentViewMode === 'documents') {
+        document.querySelectorAll('.sp-table tbody tr').forEach((el) => {
+            el.addEventListener('dblclick', (e) => {
+                if ((e.target as HTMLElement).closest('.row-select')) return;
+                const type = (el as HTMLElement).dataset.type;
+                const id = (el as HTMLElement).dataset.id;
+                if (type === 'folder' && id) {
+                    navigateToFolder(id);
+                }
+            });
         });
-    });
+    }
 
     // Rename buttons
     document.querySelectorAll('.sp-btn-rename').forEach((el) => {
@@ -354,6 +468,18 @@ const bindTableEvents = () => {
             );
         });
     });
+
+    // Restore buttons
+    document.querySelectorAll('.sp-btn-restore').forEach((el) => {
+        el.addEventListener('click', () => {
+            const btn = el as HTMLElement;
+            handleRestore(
+                btn.dataset.id!,
+                btn.dataset.type!,
+                btn.dataset.name!
+            );
+        });
+    });
 };
 
 // Row selection (delegated – attached once)
@@ -383,6 +509,7 @@ const bindNavbarEvents = () => {
     document.getElementById('btn-upload-files')?.addEventListener('click', handleUploadFiles);
     document.getElementById('btn-upload-folder')?.addEventListener('click', handleUploadFolder);
     document.getElementById('btn-sync')?.addEventListener('click', handleSync);
+    document.getElementById('btn-toggle-recycle-bin')?.addEventListener('click', handleToggleRecycleBin);
 
     const loginBtn = document.getElementById('btn-auth-login');
     if (!loginBtn) {
@@ -396,6 +523,12 @@ const bindNavbarEvents = () => {
 // Browser history (back / forward)
 const bindHistoryEvents = () => {
     window.addEventListener('popstate', (event) => {
+        const mode = event.state?.mode as TableViewMode | undefined;
+        if (mode === 'recycle-bin') {
+            openRecycleBin(false);
+            return;
+        }
+
         const folderId = event.state?.folderId || DOCUMENT_ROOT_ID;
         navigateToFolder(folderId, false); // false = don't push again
     });
@@ -410,24 +543,33 @@ export const initHome = async () => {
     bindNavbarEvents();
     bindHistoryEvents();
     bindRowSelectEvents();
+    setViewUiState(currentViewMode);
+    setTableHeaderLabels(currentViewMode);
 
     // Check URL hash for initial folder
     const hash = window.location.hash;
     const match = hash.match(/^#folder=(.+)$/);
+    const isRecycleBinHash = hash === '#recycle-bin';
 
     const user = getCurrentUser();
 
     if (!user) {
         renderSignedOutState();
-        history.replaceState({ folderId: DOCUMENT_ROOT_ID }, '', `#folder=${DOCUMENT_ROOT_ID}`);
+        history.replaceState({ mode: 'documents', folderId: DOCUMENT_ROOT_ID }, '', `#folder=${DOCUMENT_ROOT_ID}`);
+        return;
+    }
+
+    if (isRecycleBinHash) {
+        await openRecycleBin(false);
+        history.replaceState({ mode: 'recycle-bin', folderId: currentFolderId }, '', '#recycle-bin');
         return;
     }
 
     // Set initial folder from URL hash before first load
     if (match)
         currentFolderId = match[1];
-    await reloadCurrentFolder();
+    await reloadCurrentView();
 
     // Record initial state for browser back/forward (replace, not push)
-    history.replaceState({ folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
+    history.replaceState({ mode: 'documents', folderId: currentFolderId }, '', `#folder=${currentFolderId}`);
 };
