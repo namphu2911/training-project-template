@@ -155,7 +155,7 @@ const renderFileRow = (file, mode) => {
   </tr>`;
 };
 // Loading spinner
-const showLoading = () => {
+const showLoading = (message) => {
     const tbody = document.querySelector('.sp-table tbody');
     if (tbody) {
         tbody.innerHTML = `
@@ -165,7 +165,7 @@ const showLoading = () => {
             <div class="spinner-border text-secondary" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
-            <span class="sp-loading-text">Loading documents...</span>
+            <span class="sp-loading-text">${message || 'Loading documents...'}</span>
           </div>
         </td>
       </tr>`;
@@ -949,15 +949,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   logout: function() { return /* binding */ logout; }
 /* harmony export */ });
 /* harmony import */ var _azure_msal_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @azure/msal-browser */ "./node_modules/@azure/msal-browser/dist/app/PublicClientApplication.mjs");
-/* harmony import */ var _azure_msal_browser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @azure/msal-browser */ "./node_modules/@azure/msal-common/dist-browser/error/InteractionRequiredAuthError.mjs");
-/* harmony import */ var _config_auth_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config/auth.config */ "./src/scripts/config/auth.config.ts");
-/* harmony import */ var _components_grid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/_grid */ "./src/scripts/components/_grid.ts");
+/* harmony import */ var _config_auth_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config/auth.config */ "./src/scripts/config/auth.config.ts");
+/* harmony import */ var _components_grid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/_grid */ "./src/scripts/components/_grid.ts");
 
 
 
-const authority = `https://login.microsoftonline.com/${_config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.tenantId}`;
+const authority = `https://login.microsoftonline.com/${_config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.tenantId}`;
 const authLog = (...args) => {
-    if (!_config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.enableDebugLogging)
+    if (!_config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.enableDebugLogging)
         return;
     console.log('[Auth]', ...args);
 };
@@ -975,9 +974,9 @@ const getLogoutHint = (account) => {
 };
 const msalInstance = new _azure_msal_browser__WEBPACK_IMPORTED_MODULE_0__.PublicClientApplication({
     auth: {
-        clientId: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.clientId,
+        clientId: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.clientId,
         authority,
-        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
+        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
     },
     cache: {
         cacheLocation: 'localStorage',
@@ -999,11 +998,11 @@ const setActiveAccountIfMissing = () => {
 const initializeAuth = async () => {
     authLog('initializeAuth:start', {
         authority,
-        clientId: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.clientId,
-        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
-        apiScopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes,
+        clientId: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.clientId,
+        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
+        apiScopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes,
     });
-    (0,_components_grid__WEBPACK_IMPORTED_MODULE_3__.showLoading)();
+    (0,_components_grid__WEBPACK_IMPORTED_MODULE_2__.showLoading)();
     await msalInstance.initialize();
     const redirectResult = await msalInstance.handleRedirectPromise();
     if (redirectResult?.account) {
@@ -1023,16 +1022,16 @@ const initializeAuth = async () => {
 };
 const login = async () => {
     authLog('login:start');
-    if (!_config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.clientId) {
+    if (!_config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.clientId) {
         throw new Error('Please set authConfig.clientId in src/scripts/config/auth.config.ts');
     }
     authLog('login:redirect-start', {
-        scopes: ['openid', 'profile', 'offline_access', ..._config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes],
+        scopes: ['openid', 'profile', 'offline_access', ..._config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes],
     });
     await msalInstance.loginRedirect({
-        scopes: ['openid', 'profile', 'offline_access', ..._config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes],
+        scopes: ['openid', 'profile', 'offline_access', ..._config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes],
         prompt: 'select_account',
-        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
+        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
     });
 };
 const logout = async () => {
@@ -1044,18 +1043,19 @@ const logout = async () => {
     await msalInstance.logoutRedirect({
         account,
         logoutHint,
-        postLogoutRedirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
+        postLogoutRedirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
     });
     authLog('logout:done', {
-        postLogoutRedirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
+        postLogoutRedirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
         usedLogoutHint: !!logoutHint,
     });
 };
 const acquireTokenInteractive = async () => {
-    authLog('acquireTokenInteractive:start', { scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes });
+    authLog('acquireTokenInteractive:start', { scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes });
+    (0,_components_grid__WEBPACK_IMPORTED_MODULE_2__.showLoading)("Acquiring token interactively...");
     await msalInstance.acquireTokenRedirect({
-        scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes,
-        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.authConfig.redirectUri,
+        scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes,
+        redirectUri: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.authConfig.redirectUri,
     });
     throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
 };
@@ -1092,7 +1092,7 @@ const getAccessToken = async () => {
     try {
         const token = await msalInstance.acquireTokenSilent({
             account: activeAccount,
-            scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_2__.apiConfig.scopes,
+            scopes: _config_auth_config__WEBPACK_IMPORTED_MODULE_1__.apiConfig.scopes,
         });
         authLog('acquireTokenSilent:success', {
             scopes: token.scopes,
@@ -1111,15 +1111,12 @@ const getAccessToken = async () => {
     }
     catch (error) {
         authLog('acquireTokenSilent:failed', error);
-        if (error instanceof _azure_msal_browser__WEBPACK_IMPORTED_MODULE_1__.InteractionRequiredAuthError) {
-            // Clear cache on interactive error
-            cachedAccessToken = null;
-            cachedExpiresOn = null;
-            cachedFromCache = false;
-            await acquireTokenInteractive();
-            throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
-        }
-        throw error;
+        // Clear cache on interactive error
+        cachedAccessToken = null;
+        cachedExpiresOn = null;
+        cachedFromCache = false;
+        await acquireTokenInteractive();
+        throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
     }
 };
 // Optional: clear token cache on logout

@@ -144,7 +144,7 @@ const renderFileRow = (file: IFileItem, mode: TableViewMode) => {
 };
 
 // Loading spinner
-export const showLoading = () => {
+export const showLoading = (message?: string) => {
   const tbody = document.querySelector('.sp-table tbody');
   if (tbody) {
     tbody.innerHTML = `
@@ -154,7 +154,7 @@ export const showLoading = () => {
             <div class="spinner-border text-secondary" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
-            <span class="sp-loading-text">Loading documents...</span>
+            <span class="sp-loading-text">${message || 'Loading documents...'}</span>
           </div>
         </td>
       </tr>`;

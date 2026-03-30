@@ -120,6 +120,7 @@ export const logout = async () => {
 
 const acquireTokenInteractive = async (): Promise<never> => {
     authLog('acquireTokenInteractive:start', { scopes: apiConfig.scopes });
+    showLoading("Acquiring token interactively...");
 
     await msalInstance.acquireTokenRedirect({
         scopes: apiConfig.scopes,
@@ -189,16 +190,12 @@ export const getAccessToken = async (): Promise<AccessTokenResult> => {
         return { accessToken: token.accessToken, fromCache: !!token.fromCache };
     } catch (error) {
         authLog('acquireTokenSilent:failed', error);
-
-        if (error instanceof InteractionRequiredAuthError) {
-            // Clear cache on interactive error
-            cachedAccessToken = null;
-            cachedExpiresOn = null;
-            cachedFromCache = false;
-            await acquireTokenInteractive();
-            throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
-        }
-        throw error;
+        // Clear cache on interactive error
+        cachedAccessToken = null;
+        cachedExpiresOn = null;
+        cachedFromCache = false;
+        await acquireTokenInteractive();
+        throw new Error('Redirecting to Microsoft Entra ID for token acquisition.');
     }
 };
 
